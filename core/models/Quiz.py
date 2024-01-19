@@ -52,17 +52,6 @@ class Quiz(models.Model):
         verbose_name_plural = "4. Tests"
 
 
-class Variant(models.Model):
-    answer = models.CharField(max_length=218)
-    is_true = models.BooleanField(default=False)
-    test = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-
-    created = models.DateTimeField(auto_now_add=True, auto_now=False, null=True, blank=True, editable=False)
-    updated = models.DateTimeField(auto_now_add=False, auto_now=True, null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.test.name}  ||  {self.answer}  ||  {self.is_true}"
-
     def variant_format(self):
         return {
             self.answer,

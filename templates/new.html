@@ -39,9 +39,10 @@
     <div class="container">
         <h1 class="text-center">Создание теста</h1>
         <form id="addQuestionForm" method="post" action="{% url 'create_test' %}">
+                Название теста: <input type="text" class="test" name="test_name">
             {% csrf_token %}
-            <button type="button" class="btn btn-success" onclick="addQuestionField()">Добавить вопрос</button>
             <div id="questionFields"></div>
+            <button type="button" class="btn btn-success" onclick="addQuestionField()">Добавить вопрос</button>
             <button type="submit" class="btn btn-primary">Сохранить</button>
         </form>
     </div>

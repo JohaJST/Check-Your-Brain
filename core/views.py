@@ -15,8 +15,28 @@ def new_test(request):
 
 
 def create_test(request):
-    print("1")
-    if request.method == "POST":
-        data = request.POST
-        print(data)
+    if request.method == 'POST':
+        print(request.POST)
+        test_name = request.POST.get('test_name', "")
+        print(test_name)
+        if request.POST.get("test_name", ""):
+            test = Test.objects.create(name=request.POST.get('test_name'))
+            question_counter = 1
+            while f'question_{question_counter}' in request.POST:
+                question_text = request.POST[f'question_{question_counter}']
+                question = Question.objects.create(text=question_text, test=test)
+
+                variant_counter = 1
+                while f'variant_{question_counter}_{variant_counter}' in request.POST:
+                    variant_text = request.POST[f'variant_{question_counter}_{variant_counter}']
+                    is_answer = f'answer_{question_counter}_{variant_counter}' in request.POST
+                    Variant.objects.create(text=variant_text, is_answer=is_answer, question=question)
+
+                    variant_counter += 1
+
+                question_counter += 1
+
+            return redirect('/')
+        else:
+            print("error")
     return redirect("/")
