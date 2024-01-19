@@ -28,12 +28,12 @@ Text = {
     },
     "STEP4Error": {
         "uz": "Jonatin",
-        "ru": "Отправте",
+        "ru": "Отправьте",
         "en": "Send",
     },
     "MENU": {
         "uz": "Xush kelibsz",
-        "ru": "добро пожаловать",
+        "ru": "Добро пожаловать",
         "en": "Welcome",
     },
     "CTG": {
@@ -43,13 +43,13 @@ Text = {
     },
     "SUCCESS_LANG": {
         "uz": "Til O'zgardi",
-        "ru": "Til O'zgardi(ruscha)",
+        "ru": "Сменить язык",
         "en": "Til O'zgardi(encha)",
     },
     "CTGError": {
         "uz": "Bunaqa fan Yo'q",
-        "ru": "Bunaqa fan Yo'q(ruscha)",
-        "en": "Bunaqa fan Yo'q(encha)",
+        "ru": "Такой предмет не найден",
+        "en": "Subject not found",
     },
     "Prods": {
         "uz": "Mahsulotni tanlang",
@@ -78,7 +78,7 @@ Text = {
     },
     "ChoosePupil": {
         "uz": "Oquvchini tanlang",
-        "ru": "Выберите учиника",
+        "ru": "Выберите ученика",
         "en": "Choose the pupil",
     },
 }
@@ -97,7 +97,7 @@ BTN = {
         },
         "comp-tests": {
             "uz": "Bajarilgan Testlar",
-            "ru": "Решёные Тесты",
+            "ru": "Решённые Тесты",
             "en": "Completed Tests",
         },
     },
@@ -126,8 +126,8 @@ BTN = {
 ERROR = {
     "ClassRoomNotFount": {
         "uz": "Sinf topilmadi",
-        "ru": "Класс не найдено",
-        "en": "Class Room Not Fount",
+        "ru": "Класс не найден",
+        "en": "Class Room Not Found",
     },
     "TestNotFount": {
         "uz": "Uzur, testlar topilmadi",
@@ -144,7 +144,7 @@ ERROR = {
 FormatText = {
     "TestEnd": {
         "uz": "Ball: {} \nTogri javoblar: {}\nObshiy savolar: {}\nNotori javoblar: {}",
-        "ru": "Балл: {} \nПравельные ответы: {}\nКол-во вопросов: {}\nНеправильные ответы: {}",
+        "ru": "Балл: {} \nПравильные ответы: {}\nКол-во вопросов: {}\nНеправильные ответы: {}",
         "en": "Ball: {} \nTrue answers: {}\nNumber of questions: {}\nFalse answers: {}",
     },
     "Quiz": {
@@ -154,7 +154,7 @@ FormatText = {
     },
     "Comp-Tests": {
         "uz": "Bajarilgan vaqt: {} \nFan: {}\nIshlatuvchi: {}\nBall: {}\nTest: {}",
-        "ru": "Зделанное время: {} \nПредмет: {}\nПользователь: {}\nБалл: {}\nТест: {}",
+        "ru": "Сделанное время: {} \nПредмет: {}\nПользователь: {}\nБалл: {}\nТест: {}",
         "en": "Completed time: {} \nSubject: {}\nUser: {}\nBall: {}\nTest: {}",
     },
 }
