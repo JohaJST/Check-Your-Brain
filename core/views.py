@@ -17,6 +17,6 @@ def new_test(request):
 def create_test(request):
     print("1")
     if request.method == "POST":
-        data = request.POST['text']
+        data = request.POST
         print(data)
     return redirect("/")
