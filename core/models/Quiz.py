@@ -35,7 +35,7 @@ class Quiz(models.Model):
     updated = models.DateTimeField(auto_now_add=False, auto_now=True, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.name}  ||  {self.test.subject}  || Ball: {self.ball}"
+        return f"{self.name}  ||   Ball: {self.ball}"
 
     def test_format(self):
         return {
@@ -43,7 +43,7 @@ class Quiz(models.Model):
             self.img,
             self.desc,
             self.ball,
-            self.subject,
+            # self.subject,
             self.created,
             self.updated
         }
@@ -51,18 +51,17 @@ class Quiz(models.Model):
     class Meta:
         verbose_name_plural = "4. Tests"
 
+    # def variant_format(self):
+    #     return {
+    #         self.answer,
+    #         self.is_true,
+    #         self.test,
+    #         self.updated,
+    #         self.created
+    #     }
 
-    def variant_format(self):
-        return {
-            self.answer,
-            self.is_true,
-            self.test,
-            self.updated,
-            self.created
-        }
-
-    class Meta:
-        verbose_name_plural = "6. Variants"
+    # class Meta:
+    #     verbose_name_plural = "6. Variants"
 
 
 class CompletedTest(models.Model):
