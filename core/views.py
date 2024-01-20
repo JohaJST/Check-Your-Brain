@@ -16,9 +16,6 @@ def new_test(request):
 
 def create_test(request):
     if request.method == 'POST':
-        print(request.POST)
-        test_name = request.POST.get('test_name', "")
-        print(test_name)
         if request.POST.get("test_name", ""):
             test = Test.objects.create(name=request.POST.get('test_name'))
             question_counter = 1

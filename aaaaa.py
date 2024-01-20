@@ -4,14 +4,13 @@
 # print(a.isoformat())
 # # print(a.iso)
 
-
-
-
-
-
-
-
-
+num = 0
+a = 0
+for i in range(6, 27):
+    print(i)
+    num += i
+    a += 1
+print(num/a)
 # num = 1
 # summ = 1
 # b = 0
@@ -21,4 +20,3 @@
 #     summ += 1 / num
 #     num = 1
 # print(summ)
-
