@@ -1,8 +1,12 @@
 from django.db import models
 
+from core.models import ClassRooms, Subject
+
 
 class Test(models.Model):
     name = models.TextField(default="", blank=True)
+    classroom = models.ForeignKey(ClassRooms, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True, auto_now=False, null=True, blank=True, editable=False)
 
     def __str__(self):
@@ -13,6 +17,7 @@ class Question(models.Model):
     text = models.TextField()
     test = models.ForeignKey(Test, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True, auto_now=False, null=True, blank=True, editable=False)
+
     def __str__(self):
         return self.text
 
@@ -25,4 +30,3 @@ class Variant(models.Model):
 
     def __str__(self):
         return f"{self.question.test} {self.text} {self.question}"
-
