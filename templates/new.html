@@ -39,7 +39,11 @@
     <div class="container">
         <h1 class="text-center">Создание теста</h1>
         <form id="addQuestionForm" method="post" action="{% url 'create_test' %}">
-                Название теста: <input type="text" class="test" name="test_name">
+            Название теста: <label>
+            <input type="text" class="test" name="test_name">
+            <select name="subject"><option value="">-- Выберите урок --</option>{% for subject in subjects %}<option value={{ subject.id }}>{{ subject.name }}</option>{% endfor %}</select>
+            <select name="classroom"><option value="">-- Выберите класс --</option>{% for classroom in classrooms %}<option value={{ classroom.id }}>{{ classroom.name }}</option>{% endfor %}</select>
+        </label>
             {% csrf_token %}
             <div id="questionFields"></div>
             <button type="button" class="btn btn-success" onclick="addQuestionField()">Добавить вопрос</button>

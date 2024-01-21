@@ -16,24 +16,22 @@ def new_test(request):
 
 def create_test(request):
     if request.method == 'POST':
-        if request.POST.get("test_name", ""):
-            test = Test.objects.create(name=request.POST.get('test_name'))
-            question_counter = 1
-            while f'question_{question_counter}' in request.POST:
-                question_text = request.POST[f'question_{question_counter}']
-                question = Question.objects.create(text=question_text, test=test)
+        subject = Subject.objects.get(id=request.POST.get('subject'))
+        test_name = Test.objects.create(name=request.POST.get('test_name'), subject_id=subject)
+        question_counter = 1
+        while f'question_{question_counter}' in request.POST:
+            question_text = request.POST[f'question_{question_counter}']
+            question = Question.objects.create(text=question_text, test_id=test_name)
 
-                variant_counter = 1
-                while f'variant_{question_counter}_{variant_counter}' in request.POST:
-                    variant_text = request.POST[f'variant_{question_counter}_{variant_counter}']
-                    is_answer = f'answer_{question_counter}_{variant_counter}' in request.POST
-                    Variant.objects.create(text=variant_text, is_answer=is_answer, question=question)
+            variant_counter = 1
+            while f'variant_{question_counter}_{variant_counter}' in request.POST:
+                variant_text = request.POST[f'variant_{question_counter}_{variant_counter}']
+                is_answer = f'answer_{question_counter}_{variant_counter}' in request.POST
+                Variant.objects.create(text=variant_text, is_answer=is_answer, question_id=question)
 
-                    variant_counter += 1
+                variant_counter += 1
 
-                question_counter += 1
+            question_counter += 1
 
-            return redirect('/')
-        else:
-            print("error")
+        return redirect('/')
     return redirect("/")
