@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from methodism import code_decoder
 
-from core.models import User, Otp, ClassRooms
+from core.models import User, ClassRooms
 from methodism import generate_key
 import uuid
 
@@ -18,13 +18,10 @@ def sign_in(requests):
 
     if requests.POST:
         data = requests.POST
-        user = User.objects.filter(phone=data['phone']).first()
+        user = User.objects.filter(username=data['username']).first()
 
         if not user:
-            return render(requests, 'pages/auth/login.html', {"error": "Phone xato"})
-
-        if not user.check_password(data['pass']):
-            return render(requests, 'pages/auth/login.html', {"error": "Parol xato"})
+            return render(requests, 'pages/auth/login.html', {"error": "Username xato"})
 
         if not user.is_active:
             return render(requests, 'pages/auth/login.html', {"error": "Profil active emas "})
@@ -41,11 +38,8 @@ def regis(request):
     if request.POST:
         data = request.POST
         # print(data)
-        nott = "phone" if "phone" not in data\
-            else "firstname" if "first_name" not in data\
-            else "lastname" if "last_name" not in data\
-            else "password" if "pass" not in data\
-            else "password-conf" if "pass-conf" not in data\
+        nott = "username" if "username" not in data\
+            else "name" if "name" not in data\
             else "sinf" if "sinf" not in data else ""
 
         if nott:
@@ -54,11 +48,11 @@ def regis(request):
                 "sinf": c
             })
 
-        user = User.objects.filter(phone=data["phone"]).first()
+        user = User.objects.filter(username=data["username"]).first()
 
         if user:
             return render(request, "pages/auth/regis.html", {
-                "error": "Bu nomer band",
+                "error": "Bu username band",
                 "sinf": c
             })
 
@@ -76,12 +70,9 @@ def regis(request):
                 "sinf": c
             })
 
-        user_new = User.objects.create_user(phone=data["phone"], password=data["pass"], **data)
+        user_new = User.objects.create_user(username=request.POST.get('username'), name=request.POST.get('name'))
         authenticate(user_new)
         return redirect('home')
-
-
-    # print(">>>>>>", c)
 
     return render(request, "pages/auth/regis.html", {"sinf": c})
 
@@ -112,14 +103,14 @@ def regis(request):
 #             otp.save()
 #             return render(request, "pages/auth/otp.html", {"error": "Cod hato!!!"})
 #
-#         user = User.objects.get(phone=request.session["phone"])
+#         user = User.objects.get(username=request.session["username"])
 #         otp.step = "logged"
 #         login(request, user)
 #         otp.save()
 #
 #         del request.session["user_id"]
 #         del request.session["code"]
-#         del request.session["phone"]
+#         del request.session["name"]
 #         del request.session["otp_token"]
 #
 #         return redirect("home")
@@ -144,7 +135,7 @@ def regis(request):
 #
 #     request.session['otp_token'] = token.key
 #     request.session['code'] = otp
-#     request.session['phone'] = token.mobile
+#     request.session['name'] = token.mobile
 #
 #     return redirect("otp")
 

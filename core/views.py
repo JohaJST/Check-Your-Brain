@@ -5,10 +5,18 @@ from core.models import *
 
 @login_required(login_url="login")
 def index(request):
-    return render(request, 'index.html')
+    subjects = Subject.objects.all()
+    return render(request, 'index.html', {'subjects': subjects})
+
+
+def test(request):
+    subjects = Subject.objects.all()
+    tests = Test.objects.all()
+    return render(request, 'test.html', {subjects: subjects, tests: tests, })
 
 
 def new_test(request):
+    is_subject = request.GET.get("is_subject")
     class_rooms = ClassRooms.objects.all()
     subjects = Subject.objects.all()
     return render(request, "new.html", {"classrooms": class_rooms, "subjects": subjects})
@@ -36,3 +44,8 @@ def create_test(request):
 
         return redirect('/')
     return redirect("/")
+
+
+def user_profile(request):
+    current_user = request.user
+    return render(request, "profile.html", {"user": current_user})

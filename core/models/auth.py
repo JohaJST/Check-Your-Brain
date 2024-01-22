@@ -7,25 +7,22 @@ from core.models.classrooms import ClassRooms
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, phone, password, is_staff=False, is_superuser=False, **extra_fields):
-        user = self.model(phone=phone, is_staff=is_staff, is_superuser=is_superuser,
+    def create_user(self, username, password=None, is_staff=False, is_superuser=False, **extra_fields):
+        user = self.model(username=username, is_staff=is_staff, is_superuser=is_superuser,
                           **extra_fields)
-        user.set_password(password)
+        if password is not None:
+            user.set_password(password)
         user.save()
         return user
 
-    def create_superuser(self, phone, password, **extra_fields):
-        return self.create_user(phone, password, is_staff=True, is_superuser=True, **extra_fields)
+    def create_superuser(self, username, password, **extra_fields):
+        return self.create_user(username, password, is_staff=True, is_superuser=True, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    user_id = models.BigIntegerField("TG_User_ID", null=True)
-    username = models.CharField(max_length=256, null=True)
-    phone = models.CharField(unique=True, max_length=50)
-    first_name = models.CharField(max_length=256)
-    last_name = models.CharField(max_length=256)
+    username = models.CharField(max_length=256, null=True, unique=True)
+    name = models.CharField(max_length=256, null=True)
     classroom = models.ForeignKey(ClassRooms, on_delete=models.SET_NULL, null=True, blank=True)
-    birthday = models.DateField(null=True)
 
     log = models.JSONField(default={'state': 0})
     lang = models.CharField(default='uz', max_length=2, choices=[("uz", 'uz'), ("ru", 'ru'), ("en", 'en'), ])
@@ -44,14 +41,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     updated = models.DateTimeField(auto_now_add=False, auto_now=True, null=True)
     objects = CustomUserManager()
 
-    USERNAME_FIELD = 'phone'
+    USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['ut']
 
     class Meta:
         verbose_name_plural = "1. Users"
 
     def full_name(self):
-        return f"{self.last_name} {self.first_name}"
+        return f"{self.name}"
 
     def personal(self):
         ut = {
@@ -61,9 +58,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         }[self.ut]
 
         return {
-            'first_name': self.first_name,
-            'last_name': self.last_name,
-            'mobile': self.phone,
+            'username': self.username,
+            'name': self.name,
             'lang': self.lang,
             'user_type': ut,
             "ClassRoom": self.classroom,
@@ -72,12 +68,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         }
 
     def __str__(self):
-        return f"{self.id} || {self.full_name()} || {self.phone}"
+        return f"{self.id} || {self.full_name()} || {self.username}"
 
 
 class Otp(models.Model):
     key = models.CharField(max_length=512)
-    mobile = models.CharField(max_length=20)
+    username = models.CharField(max_length=20)
     is_expired = models.BooleanField(default=False)
     tries = models.SmallIntegerField(default=0)
     extra = models.JSONField(default=dict({}))
@@ -95,7 +91,7 @@ class Otp(models.Model):
         return super(Otp, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.mobile} -> {self.key}"
+        return f"{self.username} -> {self.key}"
 
     class Meta:
         verbose_name_plural = "8. One Time Password"
