@@ -48,4 +48,5 @@ def create_test(request):
 
 def user_profile(request):
     current_user = request.user
-    return render(request, "profile.html", {"user": current_user})
+    subjects = Subject.objects.all()
+    return render(request, "profile.html", {"user": current_user, "subjects": subjects})

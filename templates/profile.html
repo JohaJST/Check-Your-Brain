@@ -48,6 +48,11 @@
     width: 60%;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
+.subject{
+    background: red;
+    width: 250px;
+    text-align: center;
+}
 
 
     </style>
@@ -59,8 +64,16 @@
     <div class="left"></div>
     <div class="right"></div>
     <div class="name">
-        <h1>{{ user.name }}</h1>
+        <h1> {{ user.name }}</h1>
     </div>
-    <div class="center"></div>
+    <div class="center">
+        {% for subject in subjects %}
+             <form action="" method="GET" class="subject">
+             <input type="hidden" value="{{ subject.id }}" name="subject_id">
+             <h3>{{ subject.name }}</h3>
+             <input type="submit" value="Выбрать предмет">
+             </form>
+        {% endfor %}
+    </div>
 </body>
 </html>
