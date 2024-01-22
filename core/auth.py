@@ -34,56 +34,56 @@ def sign_in(requests):
     return render(requests, 'pages/auth/login.html')
 
 
-def regis(request):
-    c = ClassRooms.objects.all()
-    if not request.user.is_anonymous:
-        return redirect('home')
-    if request.POST:
-        data = request.POST
-        # print(data)
-        nott = "phone" if "phone" not in data\
-            else "firstname" if "first_name" not in data\
-            else "lastname" if "last_name" not in data\
-            else "password" if "pass" not in data\
-            else "password-conf" if "pass-conf" not in data\
-            else "sinf" if "sinf" not in data else ""
-
-        if nott:
-            return render(request, "pages/auth/regis.html", {
-                "error": f"{nott} datada bo'lishi kere",
-                "sinf": c
-            })
-
-        user = User.objects.filter(phone=data["phone"]).first()
-
-        if user:
-            return render(request, "pages/auth/regis.html", {
-                "error": "Bu nomer band",
-                "sinf": c
-            })
-
-        if data["pass"] != data["pass-conf"]:
-            return render(request, "pages/auth/regis.html", {
-                "error": "Parol bir biri bilan mos emas",
-                "sinf": c
-            })
-
-        sinf = ClassRooms.objects.filter(name=data["sinf"]).first()
-
-        if not sinf:
-            return render(request, "pages/auth/regis.html", {
-                "error": "Sinf topilmadi",
-                "sinf": c
-            })
-
-        user_new = User.objects.create_user(phone=data["phone"], password=data["pass"], **data)
-        authenticate(user_new)
-        return redirect('home')
-
-
-    # print(">>>>>>", c)
-
-    return render(request, "pages/auth/regis.html", {"sinf": c})
+# def regis(request):
+#     c = ClassRooms.objects.all()
+#     if not request.user.is_anonymous:
+#         return redirect('home')
+#     if request.POST:
+#         data = request.POST
+#         # print(data)
+#         nott = "phone" if "phone" not in data\
+#             else "firstname" if "first_name" not in data\
+#             else "lastname" if "last_name" not in data\
+#             else "password" if "pass" not in data\
+#             else "password-conf" if "pass-conf" not in data\
+#             else "sinf" if "sinf" not in data else ""
+#
+#         if nott:
+#             return render(request, "pages/auth/regis.html", {
+#                 "error": f"{nott} datada bo'lishi kere",
+#                 "sinf": c
+#             })
+#
+#         user = User.objects.filter(phone=data["phone"]).first()
+#
+#         if user:
+#             return render(request, "pages/auth/regis.html", {
+#                 "error": "Bu nomer band",
+#                 "sinf": c
+#             })
+#
+#         if data["pass"] != data["pass-conf"]:
+#             return render(request, "pages/auth/regis.html", {
+#                 "error": "Parol bir biri bilan mos emas",
+#                 "sinf": c
+#             })
+#
+#         sinf = ClassRooms.objects.filter(name=data["sinf"]).first()
+#
+#         if not sinf:
+#             return render(request, "pages/auth/regis.html", {
+#                 "error": "Sinf topilmadi",
+#                 "sinf": c
+#             })
+#
+#         user_new = User.objects.create_user(phone=data["phone"], password=data["pass"], **data)
+#         authenticate(user_new)
+#         return redirect('home')
+#
+#
+#     # print(">>>>>>", c)
+#
+#     return render(request, "pages/auth/regis.html", {"sinf": c})
 
 # def otp(request):
 #     if not request.session.get("otp_token"):
