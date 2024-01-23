@@ -29,6 +29,7 @@ DEBUG = os.getenv("DEBUG", True)
 
 ALLOWED_HOSTS = [os.getenv("ALLOWED_HOST", '*')]
 
+APP_NAME = "Check Your Brain"
 
 # Application definition
 

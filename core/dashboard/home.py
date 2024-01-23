@@ -1,4 +1,5 @@
 from django.shortcuts import redirect, render
 
-def index(requests):
-    pass
+
+def home(requests):
+    return render(requests, 'pages/dashboard/index.html')
