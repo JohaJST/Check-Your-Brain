@@ -1,18 +1,29 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from core.models import *
+from core.models.test import Result
 
 
 @login_required(login_url="login")
 def index(request):
     subjects = Subject.objects.all()
-    return render(request, 'index.html', {'subjects': subjects})
+    test_list = []
+    is_subject = True
+    if request.GET.get("is_subject") == "false":
+        is_subject = False
+        for test_ in Test.objects.all():
+            if test_.subject == Subject.objects.get(id=request.GET.get("subject")):
+                test_list.append(test_)
+    return render(request, 'index.html', {'subjects': subjects, "tests": test_list, "is_subject": is_subject})
 
 
 def test(request):
     subjects = Subject.objects.all()
     tests = Test.objects.all()
-    return render(request, 'test.html', {subjects: subjects, tests: tests, })
+    questions = Question.objects.all()
+    variants = Variant.objects.all()
+    ctx = {"subjects": subjects, "tests": tests, "questions": questions, "variants": variants}
+    return render(request, 'test.html', ctx)
 
 
 def new_test(request):
@@ -48,5 +59,22 @@ def create_test(request):
 
 def user_profile(request):
     current_user = request.user
-    subjects = Subject.objects.all()
-    return render(request, "profile.html", {"user": current_user, "subjects": subjects})
+    results = Result.objects.all()
+    results_list = []
+    average = 0
+    tmp = 0
+    for result in results:
+        if result.user == current_user:
+            results_list.append(result)
+            average += result.result
+            tmp += 1
+
+    ctx = {"user": current_user, "results": results, "average": average/tmp}
+    return render(request, "profile.html", ctx)
+
+
+def test_answer(request):
+    current_user = request.user
+    test_ = Test.objects.get(id=request.POST.get('test_id'))
+    ctx = {"user": current_user, "test": test_}
+    return render(request, "answer.html", ctx)

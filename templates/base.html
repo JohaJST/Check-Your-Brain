@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <title>{% block title %}{% endblock %}</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        .navbar {
+            background-color: #333;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .user-date {
+            margin-left: auto;
+        }
+    </style>
+    {% block header %}{% endblock %}
+</head>
+<body>
+    <div class="navbar">
+        <a href="{% url 'home' %}">Список предметов</a>
+        <a href="{% url 'user_profile' %}">Профиль</a>
+        {% if user.is_admin %}
+            <a href="{% url 'dashboard' %}">Панель управления</a>
+        {% endif %}
+        <div class="user-date">
+            <a href="{% url 'user_profile' %}">{{ user.name }}</a>
+        </div>
+    </div>
+    
+    {% block body %}{% endblock %}
+</body>
+</html>

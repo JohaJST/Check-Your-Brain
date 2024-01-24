@@ -1,5 +1,5 @@
 from django.urls import path
-from core.views import index, new_test, create_test, user_profile
+from core.views import index, new_test, create_test, user_profile, test, test_answer
 from core.auth import sign_in, sign_out
 from .dashboard.home import home
 
@@ -8,6 +8,8 @@ urlpatterns = [
     path("login", sign_in, name="login"),
     path("logout/", sign_out, name="logout"),
     path("user/", user_profile, name="user_profile"),
+    path("test/<int:test_id>", test, name="test"),
+    path("test/answer", test_answer, name="test_answer"),
     path("test/new/", new_test, name="new_test"),
     path("test/create/", create_test, name="create_test"),
     path("dashboard/", home, name="dashboard")

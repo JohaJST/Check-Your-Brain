@@ -1,27 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block title %}{% if is_subject%}Предметы{% else %}Тесты{% endif %}{% endblock %}
+{% block header %}
+{% endblock %}
+{% block body %}
 {% if is_subject %}
     {% for subject in subjects %}
-        <form action="{% url 'test_list' %}" method="GET">
+        <form action="{% url 'home' %}" method="GET">
         <p>{{ subject.name }}</p>
         <input type="hidden" value="{{ subject.id }}" name="subject">
-        <input type="hidden" value="1" name="is_subject">
-        <input type="submit">
+        <input type="hidden" value="false" name="is_subject">
+        <input type="submit" value="Выбрать предмет">
         </form>
     {% endfor %}
 {% else %}
      {% for test in tests %}
-        <form action="{% url 'test' %}">
+        <form action="{% url 'test' test_id=test.id%}" class="test_c">
         <p>{{ test.name }}</p>
-        <input type="hidden" value={{ test.id }}>
-        <input type="submit">
+        <input type="submit" value="Выбрать тест">
         </form>
     {% endfor %}
 {% endif %}
-</body>
-</html>
+{% endblock %}

@@ -1,15 +1,8 @@
-import datetime
-import random
-
-from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
-from methodism import code_decoder
 
 from core.models import User, ClassRooms
-from methodism import generate_key
-import uuid
 
 
 def sign_in(requests):

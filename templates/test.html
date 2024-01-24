@@ -1,12 +1,20 @@
 <!DOCTYPE html>
-{% load static %}
+
 <html lang="en" >
 <head>
   <meta charset="UTF-8">
   <title>Check Your Level</title>
   <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
-    {%  %}
+
+<form id="quizForm" method="post" action="{% url 'test_answer' %}">
+    {% csrf_token %}
+    {% for question in questions %}
+        
+    {% endfor %}
+    <input type="submit" value="Проверить ответы">
+</form>
+
 <body>
 </body>
 </html>
