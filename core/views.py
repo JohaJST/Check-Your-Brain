@@ -17,7 +17,7 @@ def index(request):
     return render(request, 'index.html', {'subjects': subjects, "tests": test_list, "is_subject": is_subject})
 
 
-def test(request):
+def test(request, test_id):
     subjects = Subject.objects.all()
     tests = Test.objects.all()
     questions = Question.objects.all()
