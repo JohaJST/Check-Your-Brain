@@ -17,7 +17,12 @@ def index(request):
     return render(request, 'index.html', {'subjects': subjects, "tests": test_list, "is_subject": is_subject})
 
 
+
 def test(request, test_id):
+    if request.POST:
+        data = request.POST
+        print(data)
+        return redirect("home")
     subjects = Subject.objects.all()
     tests = Test.objects.all()
     questions = Question.objects.all()
