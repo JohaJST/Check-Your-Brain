@@ -1,11 +1,27 @@
+from contextlib import closing
+
 from django.contrib.auth.decorators import login_required
+from django.db import connection
 from django.shortcuts import render, redirect
+from methodism import dictfetchone, dictfetchall
+
 from core.models import Subject, Result, Test
 
 
 @login_required(login_url="login")
 def index(request):
-    subjects = Subject.objects.all()
+    sql = f"""
+    SELECT s.id, s.name
+    FROM core_classroomssubjects cs
+    INNER JOIN core_subject s ON cs.subject_id = s.id
+    WHERE cs.classroom_id = {request.user.classroom_id}
+    group by s.id 
+    """
+    with closing(connection.cursor()) as cursor:
+        cursor.execute(sql)
+        subjects = dictfetchall(cursor)
+    print(subjects)
+    # subjects = Subject.objects.all()
     test_list = []
     is_subject = True
     if request.GET.get("is_subject") == "false":
