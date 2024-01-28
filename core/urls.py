@@ -1,5 +1,5 @@
 from django.urls import path
-from core.views import index, new_test, create_test, user_profile, test, test_answer
+from core.quiz import index, new_test, create_test, user_profile, test, test_answer
 from core.auth import sign_in, sign_out
 from .dashboard.home import home
 

@@ -37,3 +37,9 @@ class ClassRooms(models.Model):
 
     class Meta:
         verbose_name_plural = '2. Class Rooms'
+
+
+class ClassRoomsSubjects(models.Model):
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    classroom = models.ForeignKey(ClassRooms, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True, auto_now=False, null=True, blank=True, editable=False)
