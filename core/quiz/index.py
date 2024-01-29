@@ -20,16 +20,17 @@ def index(request):
     with closing(connection.cursor()) as cursor:
         cursor.execute(sql)
         subjects = dictfetchall(cursor)
-    print(subjects)
+    # print(subjects)
     # subjects = Subject.objects.all()
-    test_list = []
-    is_subject = True
+    # print("1")
     if request.GET.get("is_subject") == "false":
-        is_subject = False
-        for test_ in Test.objects.all():
-            if test_.subject == Subject.objects.get(id=request.GET.get("subject")):
-                test_list.append(test_)
-    return render(request, 'index.html', {'subjects': subjects, "tests": test_list, "is_subject": is_subject})
+        tests = Test.objects.filter(subject_id=request.GET.get("subject"))
+        # print(tests)
+        # print("11")
+        return render(request, 'index.html', {'tests': tests})
+    # print("2")
+    # print(subjects)
+    return render(request, 'index.html', {'subjects': subjects,  "is_subject": True})
 
 
 @login_required(login_url="login")
