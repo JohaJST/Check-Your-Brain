@@ -21,26 +21,17 @@ def test(request, test_id):
         data = request.POST
         # print(data)
         return redirect("home")
-    try:
-        sql = """
-            SELECT
-                q.id AS question_id,
-                q.text AS question_name,
-                v.text AS variant_name,
-                v.is_answer
-            FROM
-                core_question q
-            JOIN
-                core_variant v ON q.id = v.question_id
-            WHERE
-                q.test_id = 2;
-        """
-        # test = Test.objects.filter(id=test_id).first()
-        with closing(connection.cursor()) as cursor:
-            cursor.execute(sql)
-            subjects = dictfetchall(cursor)
-    except:
-        return redirect("home")
-    return render(request, 'test.html', {"all": sql})
-
-
+    # try:
+    question = Question.objects.filter(test_id=test_id)
+    print(question)
+    variant = Variant.objects.all()
+    print(variant)
+    answer = Variant.objects.filter(is_answer=True)
+    print(answer)
+    ctx = {"question": question,
+           "answer": answer,
+           "variant": variant
+           }
+    # except:
+    #     return redirect("home")
+    return render(request, 'test.html', ctx)
