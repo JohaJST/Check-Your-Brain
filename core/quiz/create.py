@@ -31,3 +31,12 @@ def create_test(request):
 
         return redirect('/')
     return redirect("/")
+
+
+def subject(request, st, pk=None):
+    if st == "list":
+        subjects = Subject.objects.all()
+        return render(request, 'pages/dashboard/list.html', {"name": "Subject", "root": subjects})
+
+def classroom(request, st, pk=None):
+    pass

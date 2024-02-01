@@ -39,6 +39,9 @@
             </div>
             <div class="option_list">
                 <!-- Here I've inserted options from JavaScript -->
+                {% for v in variant %}{% if v.question_id == question.first.id %}
+                    <div class="option"><span>1</span></div>
+                {% endif %} {% endfor %}
             </div>
         </section>
 
@@ -79,16 +82,26 @@
 
     //creating a new span and div tag for question and option and passing the value using array index
     let que_tag = '<span>'+ questions[index].numb + ". " + questions[index].question +'</span>';
-    let option_tag = {% for q in question %}{% for v in variant %}{% if v.question_id == q.id %}
-        '<div class="option"><span>'+ questions[index].options[{{ forloop.counter0 }}] +'</span></div>'{% endif %}{% endfor %}{% endfor %};
+    {#let option_tag = {% for q in question %}{% for v in variant %}{% if v.question_id == q.id %}#}
+    {#    '<div class="option"><span>'+ questions[index].options[{{ forloop.counter0 }}] +'</span></div>'{% endif %}{% endfor %}{% endfor %};#}
     que_text.innerHTML = que_tag; //adding new span tag inside que_tag
-    option_list.innerHTML = option_tag; //adding new div tag inside option_tag
+    {#option_list.innerHTML = option_tag; //adding new div tag inside option_tag#}
 
     const option = option_list.querySelectorAll(".option");
+    {#option.innerHTML = "Test"#}
+    var myClasses = document.getElementsByClassName("option");
 
+    for (var i = 0; i < myClasses.length; i++) {
+      myClasses[i].innerHTML = questions[index].options[i];
+      }
     // set onclick attribute to all available options
     for(i=0; i < option.length; i++){
         option[i].setAttribute("onclick", "optionSelected(this)");
+    }
+    const allOptions = option_list.children.length; //getting all option items
+
+    for(i=0; i < allOptions; i++){
+        option_list.children[i].classList.remove("disabled"); //once user select an option then disabled all options
     }
 }
     </script>
@@ -98,8 +111,8 @@
             {
             numb: {{ q.id }},
             question: "{{ q.text }}",
-            {% for a in answer %}
-                {% if a.question_id == q.id %}
+            {% for a in variant %}
+                {% if a.question_id == q.id and a.is_answer %}
                     answer: "{{ a.text }}",
                 {% endif %}
             {% endfor %}

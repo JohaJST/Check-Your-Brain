@@ -3,9 +3,9 @@ from contextlib import closing
 from django.contrib.auth.decorators import login_required
 from django.db import connection
 from django.shortcuts import render, redirect
-from methodism import dictfetchall
+from methodism import dictfetchall, dictfetchone
 
-from core.models import Test, Question, Variant, Subject
+from core.models import Test, Question, Variant, Subject, Result
 
 
 def test_answer(request):
@@ -20,16 +20,23 @@ def test(request, test_id):
     if request.POST:
         data = request.POST
         # print(data)
+        sql = f"SELECT count(*) from core_question q where q.test_id = {test_id}"
+        with closing(connection.cursor()) as cursor:
+            cursor.execute(sql)
+            totalQuestion = dictfetchone(cursor)
+        # print(totalQuestion)
+        foyiz = int(data["result"]) * 100 / totalQuestion["count(*)"]
+        Result.objects.create(test_id=test_id, user=request.user, result=int(data["result"]), foyiz=foyiz)
         return redirect("home")
     # try:
     question = Question.objects.filter(test_id=test_id)
-    print(question)
+    # print(question)
     variant = Variant.objects.all()
-    print(variant)
-    answer = Variant.objects.filter(is_answer=True)
-    print(answer)
+    # print(variant)
+    # answer = Variant.objects.filter(is_answer=True)
+    # print(answer)
     ctx = {"question": question,
-           "answer": answer,
+           # "answer": answer,
            "variant": variant
            }
     # except:
