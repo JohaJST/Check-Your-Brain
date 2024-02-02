@@ -86,9 +86,11 @@ next_btn.onclick = ()=>{
         next_btn.classList.remove("show"); //hide the next button
     }else{
         // console.log("False (else)")
+        var form = document.getElementById("results-id");
         clearInterval(counter); //clear counter
         clearInterval(counterLine); //clear counterLine
         showResult(); //calling showResult function
+        form.submit();
     }
 }
 

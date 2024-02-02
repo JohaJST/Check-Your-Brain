@@ -64,7 +64,7 @@
             <!-- Here I've inserted Score Result from JavaScript -->
         </div>
         <div class="buttons">
-            <form method="post">
+            <form method="post" id="results-id">
                 {% csrf_token %}
     {#            <button class="restart">Replay Quiz</button>#}
                     <div class="result_for_backend"></div>
@@ -110,7 +110,7 @@
         {% for q in question %}
             {
             numb: {{ q.id }},
-            question: "{{ q.text }}",
+            question: "{{ q.tгугл переводчикext }}",
             {% for a in variant %}
                 {% if a.question_id == q.id and a.is_answer %}
                     answer: "{{ a.text }}",

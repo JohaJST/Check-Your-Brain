@@ -42,6 +42,7 @@ class Variant(models.Model):
 class Result(models.Model):
     foyiz = models.IntegerField(null=True, blank=True)
     result = models.IntegerField(null=True)
+    totalQuestions = models.IntegerField(null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     test = models.ForeignKey(Test, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True, auto_now=False, null=True, blank=True, editable=False)

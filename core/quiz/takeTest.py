@@ -26,7 +26,7 @@ def test(request, test_id):
             totalQuestion = dictfetchone(cursor)
         # print(totalQuestion)
         foyiz = int(data["result"]) * 100 / totalQuestion["count(*)"]
-        Result.objects.create(test_id=test_id, user=request.user, result=int(data["result"]), foyiz=foyiz)
+        Result.objects.create(test_id=test_id, user=request.user, result=int(data["result"]), foyiz=foyiz, totalQuestions=totalQuestion["count(*)"])
         return redirect("home")
     # try:
     question = Question.objects.filter(test_id=test_id)
