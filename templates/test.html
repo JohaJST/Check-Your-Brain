@@ -110,7 +110,7 @@
         {% for q in question %}
             {
             numb: {{ q.id }},
-            question: "{{ q.tгугл переводчикext }}",
+            question: "{{ q.text }}",
             {% for a in variant %}
                 {% if a.question_id == q.id and a.is_answer %}
                     answer: "{{ a.text }}",
