@@ -8,6 +8,7 @@ class Test(models.Model):
     desc = models.TextField(null=True, blank=True)
     classroom = models.ForeignKey(ClassRooms, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    is_start = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, auto_now=False, null=True, blank=True, editable=False)
 
     def __str__(self):
