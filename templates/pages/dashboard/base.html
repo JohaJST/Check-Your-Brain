@@ -186,13 +186,25 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{% url 'dlist' tip='user' %}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>User</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'dlist' tip='result' %}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Result</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'dlist' tip='classroom' %}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Class Room</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{% url 'dlist' tip='subject' %}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Subject</p>
                 </a>
@@ -200,7 +212,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <li class="nav-item">
                 <a href="#" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Add Quiz</p>
+                  <p>Quiz</p>
                 </a>
               </li>
             </ul>

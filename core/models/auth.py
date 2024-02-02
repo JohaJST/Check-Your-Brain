@@ -22,6 +22,7 @@ class CustomUserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=256, unique=True)
     name = models.CharField(max_length=256, null=True)
+    last_name = models.CharField(max_length=256, null=True)
     classroom = models.ForeignKey(ClassRooms, on_delete=models.SET_NULL, null=True, blank=True)
     just = models.BooleanField(default=False)
 
@@ -49,7 +50,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = "1. Users"
 
     def full_name(self):
-        return f"{self.name}"
+        return f"{self.last_name} {self.name}"
 
     def personal(self):
         ut = {
