@@ -381,3 +381,8 @@ footer button.show{
     color: #fff;
     background: #007bff;
 }
+.wait-text{
+    background-color: green;
+    margin: 0 auto;
+    text-align: center;
+}

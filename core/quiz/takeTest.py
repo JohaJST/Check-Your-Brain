@@ -3,6 +3,7 @@ from contextlib import closing
 from django.contrib.auth.decorators import login_required
 from django.db import connection
 from django.shortcuts import render, redirect
+from django.views.generic import View
 from methodism import dictfetchall, dictfetchone
 
 from core.models import Test, Question, Variant, Subject, Result
@@ -37,8 +38,12 @@ def test(request, test_id):
     # print(answer)
     ctx = {"question": question,
            # "answer": answer,
-           "variant": variant
+           "variant": variant,
+           "test": Test.objects.get(id=test_id)
            }
     # except:
     #     return redirect("home")
     return render(request, 'test.html', ctx)
+
+
+

@@ -151,3 +151,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 RANGE = os.getenv("RANGE")
 
 TOKEN = os.getenv("TOKEN")
+
