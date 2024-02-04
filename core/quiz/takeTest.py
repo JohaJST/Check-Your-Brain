@@ -41,7 +41,6 @@ def test(request, test_id):
            "variant": variant,
            "test": Test.objects.get(id=test_id)
            }
-    # except:
     #     return redirect("home")
     return render(request, 'test.html', ctx)
 
