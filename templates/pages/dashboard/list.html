@@ -23,7 +23,8 @@
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Name</th>
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Class Room</th>
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Username</th>
-
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Icon</th>
+                        
                     {% elif name == "Result" %}
 
 {#                        <th class="sorting_asc" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-sort="ascending">Name</th>#}
@@ -34,7 +35,34 @@
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Foyiz</th>
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Kolichestva Vop.</th>
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Test</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Icon</th>
+                        
+                    {% elif name == "Quiz" %}
+                        
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Name</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Desc</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Subject</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Class Room</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Status</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Icon</th>
+                        
+                    {% elif name == "Question" %}
+                        
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Id</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Name</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Img</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Quiz Name</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Icon</th>
+                        
+                    {% elif name == "Variant" %}
 
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">ID</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Name</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Answer</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Test Name</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Question Name</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Icon</th>
+                        
                     {% endif %}
                 </tr>
                 </thead>
@@ -43,26 +71,52 @@
                     {% if name == "Subject" or name == "ClassRoom" %}
                         <tr role="row" class="odd">
                           <td>{{ i.name }}</td>
-                          <td>
-
-                          </td>
+                          <td> </td>
                         </tr>
                     {% elif name == "User" %}
                         <tr role="row" class="odd">
-                          <td>{{ i.last_name }}</td>
-                          <td>{{ i.name }}</td>
-                          <td>{{ i.classroom.name }}</td>
-                          <td>{{ i.username }}</td>
+                            <td>{{ i.last_name }}</td>
+                            <td>{{ i.name }}</td>
+                            <td>{{ i.classroom.name }}</td>
+                            <td>{{ i.username }}</td>
+                            <td> </td>
                         </tr>
                     {% elif name == "Result" %}
                        <tr role="row" class="odd">
-                           <td>{{ i.id }}</td>
-                           <td>{{ i.user.last_name }} {{ i.user.name }}</td>
-                           <td>{{ i.user.classroom.name }}</td>
-                           <td>{{ i.result }}</td>
-                          <td>{{ i.foyiz }}</td>
-                          <td>{{ i.totalQuestions }}</td>
-                          <td>{{ i.test.name }}</td>
+                        <td>{{ i.id }}</td>
+                        <td>{{ i.user.last_name }} {{ i.user.name }}</td>
+                        <td>{{ i.user.classroom.name }}</td>
+                        <td>{{ i.result }}</td>
+                        <td>{{ i.foyiz }}</td>
+                        <td>{{ i.totalQuestions }}</td>
+                        <td>{{ i.test.name }}</td>
+                        <td> </td>
+                       </tr>
+                    {% elif name == "Question" %}
+                       <tr role="row" class="odd">
+                        <td>{{ i.id }}</td>
+                        <td>{{ i.text }}</td>
+                        <td>{{ i.img }}</td>
+                        <td>{{ i.test.name }}</td>
+                        <td> </td>
+                       </tr>
+                    {% elif name == "Variant" %}
+                       <tr role="row" class="odd">
+                        <td>{{ i.id }}</td>
+                           <td>{{ i.text }}</td>
+                           <td>{% if i.is_answer %}Yes{% else %}No{% endif %}</td>
+                           <td>{{ i.question.test.name }}</td>
+                           <td>{{ i.question.text }}</td>
+                        <td> </td>
+                       </tr>
+                    {% elif name == "Quiz" %}
+                       <tr role="row" class="odd">
+                           <td>{{ i.name }}</td>
+                           <td>{{ i.desc }}</td>
+                           <td>{{ i.subject.name }}</td>
+                           <td>{{ i.classroom.name }}</td>
+                           <td>{% if i.is_start %}Boshlangan{% else %}<a href="{% url 'action' status='start' pk=i.id path='quiz' %}">Boshlash</a>{% endif %}</td>
+                          <td> </td>
                        </tr>
                     {% endif %}
                 {% endfor %}

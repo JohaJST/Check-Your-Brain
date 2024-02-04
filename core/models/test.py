@@ -20,6 +20,7 @@ class Test(models.Model):
     #         a += 1
     #
 
+
 class Question(models.Model):
     text = models.TextField(null=True, blank=True)
     img = models.ImageField(null=True, blank=True)
