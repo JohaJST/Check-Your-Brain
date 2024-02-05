@@ -115,7 +115,7 @@
                            <td>{{ i.desc }}</td>
                            <td>{{ i.subject.name }}</td>
                            <td>{{ i.classroom.name }}</td>
-                           <td>{% if i.is_start %}Boshlangan{% else %}<a href="{% url 'action' status='start' pk=i.id path='quiz' %}">Boshlash</a>{% endif %}</td>
+                           <td>{% if i.is_start %}<a href="{% url 'action' status='end' pk=i.id path='quiz' %}">Boshlangan</a>{% else %}<a href="{% url 'action' status='start' pk=i.id path='quiz' %}">Boshlash</a>{% endif %}</td>
                           <td> </td>
                        </tr>
                     {% endif %}
