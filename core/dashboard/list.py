@@ -21,6 +21,8 @@ def dlist(request, tip=None):
             return render(request, 'pages/dashboard/list.html', {"name": "Variant", "root": Variant.objects.all()})
         elif tip == "question":
             return render(request, 'pages/dashboard/list.html', {"name": "Question", "root": Question.objects.all()})
+        elif tip == "new":
+            return render(request, 'pages/dashboard/new.html')
         return render(request, 'pages/dashboard/list.html')
     else:
         return redirect('home')

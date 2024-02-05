@@ -6,7 +6,7 @@ def new_test(request):
     is_subject = request.GET.get("is_subject")
     class_rooms = ClassRooms.objects.all()
     subjects = Subject.objects.all()
-    return render(request, "new.html", {"classrooms": class_rooms, "subjects": subjects})
+    return render(request, "pages/dashboard/new.html", {"classrooms": class_rooms, "subjects": subjects})
 
 
 def create_test(request):
