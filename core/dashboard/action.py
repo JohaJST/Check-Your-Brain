@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from core.models import Test, ClassRooms, Subject, ClassRoomsSubjects
+from core.models import Test, ClassRooms, Subject, ClassRoomsSubjects, Question, Variant
 
 
 def action(request, status, path, pk=None):
@@ -51,6 +51,27 @@ def action(request, status, path, pk=None):
                     class_room.save()
                     return redirect("/dashboard/list/classroom/")
             return redirect("dlist", tip=path)
+        elif status == "delete":
+            if path == "subject":
+                subject = Subject.objects.get(id=pk)
+                subject.delete()
+                return redirect("/dashboard/list/subject/")
+            elif path == "classroom":
+                classroom = ClassRooms.objects.get(id=pk)
+                classroom.delete()
+                return redirect("/dashboard/list/classroom/")
+            elif path == "quiz":
+                test = Test.objects.get(id=pk)
+                test.delete()
+                return redirect("/dashboard/list/quiz/")
+            elif path == "question":
+                question = Question.objects.get(id=pk)
+                question.delete()
+                return redirect("/dashboard/list/question/")
+            elif path == "variant":
+                variant = Variant.objects.get(id=pk)
+                variant.delete()
+                return redirect("/dashboard/list/variant/")
         else:
             return redirect("dlist", tip=path)
     else:

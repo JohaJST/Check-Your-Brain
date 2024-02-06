@@ -14,7 +14,7 @@
                 <tr role="row">
                     {% if name == "Subject" or name == "ClassRoom" %}
                         <th class="sorting_asc" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-sort="ascending">Name</th>
-                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Icon</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Action</th>
 
                     {% elif name == "User" %}
 
@@ -23,7 +23,7 @@
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Name</th>
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Class Room</th>
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Username</th>
-                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Icon</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Action</th>
                         
                     {% elif name == "Result" %}
 
@@ -35,7 +35,7 @@
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Foyiz</th>
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Kolichestva Vop.</th>
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Test</th>
-                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Icon</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Action</th>
                         
                     {% elif name == "Quiz" %}
                         
@@ -44,7 +44,7 @@
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Subject</th>
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Class Room</th>
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Status</th>
-                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Icon</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Action</th>
                         
                     {% elif name == "Question" %}
                         
@@ -52,7 +52,7 @@
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Name</th>
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Img</th>
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Quiz Name</th>
-                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Icon</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Action</th>
                         
                     {% elif name == "Variant" %}
 
@@ -61,7 +61,7 @@
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Answer</th>
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Test Name</th>
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Question Name</th>
-                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Icon</th>
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Action</th>
                         
                     {% endif %}
                 </tr>
@@ -71,7 +71,11 @@
                     {% if name == "Subject" or name == "ClassRoom" %}
                         <tr role="row" class="odd">
                           <td>{{ i.name }}</td>
-                          <td> </td>
+                          <td>
+                           <a href="{% url "action" status="delete" path="subject" pk=i.id %}" class="btn btn-danger ml-4 btn-circle btn-wd">
+                               <i class="fa fa-trash"></i>
+                           </a>
+                          </td>
                         </tr>
                     {% elif name == "User" %}
                         <tr role="row" class="odd">
@@ -79,7 +83,11 @@
                             <td>{{ i.name }}</td>
                             <td>{{ i.classroom.name }}</td>
                             <td>{{ i.username }}</td>
-                            <td> </td>
+                            <td>
+                               <a href="{% url "action" status="delete" path="user" pk=i.id %}" class="btn btn-danger ml-4 btn-circle btn-wd">
+                                   <i class="fa fa-trash"></i>
+                               </a>
+                            </td>
                         </tr>
                     {% elif name == "Result" %}
                        <tr role="row" class="odd">
@@ -90,7 +98,11 @@
                         <td>{{ i.foyiz }}</td>
                         <td>{{ i.totalQuestions }}</td>
                         <td>{{ i.test.name }}</td>
-                        <td> </td>
+                        <td>
+                           <a href="{% url "action" status="delete" path="result" pk=i.id %}" class="btn btn-danger ml-4 btn-circle btn-wd">
+                               <i class="fa fa-trash"></i>
+                           </a>
+                       </td>
                        </tr>
                     {% elif name == "Question" %}
                        <tr role="row" class="odd">
@@ -98,7 +110,11 @@
                         <td>{{ i.text }}</td>
                         <td>{{ i.img }}</td>
                         <td>{{ i.test.name }}</td>
-                        <td> </td>
+                       <td>
+                           <a href="{% url "action" status="delete" path="question" pk=i.id %}" class="btn btn-danger ml-4 btn-circle btn-wd">
+                               <i class="fa fa-trash"></i>
+                           </a>
+                       </td>
                        </tr>
                     {% elif name == "Variant" %}
                        <tr role="row" class="odd">
@@ -107,7 +123,11 @@
                            <td>{% if i.is_answer %}Yes{% else %}No{% endif %}</td>
                            <td>{{ i.question.test.name }}</td>
                            <td>{{ i.question.text }}</td>
-                        <td> </td>
+                        <td>
+                            <a href="{% url "action" status="delete" path="variant" pk=i.id %}" class="btn btn-danger ml-4 btn-circle btn-wd">
+                               <i class="fa fa-trash"></i>
+                           </a>
+                        </td>
                        </tr>
                     {% elif name == "Quiz" %}
                        <tr role="row" class="odd">
@@ -116,7 +136,11 @@
                            <td>{{ i.subject.name }}</td>
                            <td>{{ i.classroom.name }}</td>
                            <td>{% if i.is_start %}<a href="{% url 'action' status='end' pk=i.id path='quiz' %}">Boshlangan</a>{% else %}<a href="{% url 'action' status='start' pk=i.id path='quiz' %}">Boshlash</a>{% endif %}</td>
-                          <td> </td>
+                          <td>
+                              <a href="{% url "action" status="delete" path="quiz" pk=i.id %}" class="btn btn-danger ml-4 btn-circle btn-wd">
+                               <i class="fa fa-trash"></i>
+                              </a>
+                          </td>
                        </tr>
                     {% endif %}
                 {% endfor %}
