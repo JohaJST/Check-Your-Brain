@@ -36,20 +36,42 @@
     </style>
 {% endblock %}
 {% block content %}
-    <div class="container">
-        <h1 class="text-cent:er">Создание теста</h1>
-        <form id="addQuestionForm" method="post" action="{% url 'create_test' %}">
-            Название теста: <label>
-            <input type="text" class="test" name="test_name">
-            <select name="subject"><option value="">-- Выберите урок --</option>{% for subject in subjects %}<option value={{ subject.id }}>{{ subject.name }}</option>{% endfor %}</select>
-            <select name="classroom"><option value="">-- Выберите класс --</option>{% for classroom in classrooms %}<option value={{ classroom.id }}>{{ classroom.name }}</option>{% endfor %}</select>
-        </label>
-            {% csrf_token %}
-            <div id="questionFields"></div>
-            <button type="button" class="btn btn-success" onclick="addQuestionField()">Добавить вопрос</button>
-            <button type="submit" class="btn btn-primary">Сохранить</button>
-        </form>
-    </div>
+    {% if action == "test" %}
+        <div class="container">
+            <h1 class="text-cent:er">Создание теста</h1>
+            <form id="addQuestionForm" method="post" action="{% url 'create_test' %}">
+                Название теста: <label>
+                <input type="text" class="test" name="test_name">
+                <select name="subject"><option value="">-- Выберите урок --</option>{% for subject in subjects %}<option value={{ subject.id }}>{{ subject.name }}</option>{% endfor %}</select>
+                <select name="classroom"><option value="">-- Выберите класс --</option>{% for classroom in classrooms %}<option value={{ classroom.id }}>{{ classroom.name }}</option>{% endfor %}</select>
+            </label>
+                {% csrf_token %}
+                <div id="questionFields"></div>
+                <button type="button" class="btn btn-success" onclick="addQuestionField()">Добавить вопрос</button>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </form>
+        </div>
+    {% elif action == "subject"%}
+        <div class="container">
+            <form id="addQuestionForm" method="post" action="{% url 'create_test' %}">
+                {% csrf_token %}
+                Название урока: <label>
+                <input type="text" class="test" name="subject_name">
+                </label><button type="submit" class="btn btn-primary">Сохранить</button>
+            </form>
+        </div>
+    {% elif action == "classroom" %}
+        <div class="container">
+            <form id="addQuestionForm" method="post" action="{% url 'create_test' %}">
+                {% csrf_token %}
+                Название класса: <label>
+                <input type="text" class="test" name="classroom_name">
+                <div id="classroomsField"></div>
+                <button type="button" class="btn btn-success" onclick="addClassRoom()">Добавить класс</button>
+                </label><button type="submit" class="btn btn-primary">Сохранить</button>
+            </form>
+        </div>
+    {% endif %}
     
     <script>
         let questionCounter = 1;
@@ -75,6 +97,19 @@
                     Ответ? <input type="checkbox" name="answer_${questionId}_${variantContainer.childElementCount + 1}">
                 </div>`;
             variantContainer.insertAdjacentHTML('beforeend', variantFieldHTML);
+        }
+        let classroom_id;
+        let classroom_id_option;
+        function addClassRoom(){
+            const classroomCounter = document.getElementById('classroomsField');
+            const classroomFieldHTML = `
+                    <select>
+                        {% for i in classrooms %}
+                            <option name=i.id>i.name</option>
+                        {% endfor %}
+                    </select>
+            `;
+            classroomCounter.insertAdjacentHTML('beforeend', classroomFieldHTML);
         }
     </script>
 {% endblock %}
