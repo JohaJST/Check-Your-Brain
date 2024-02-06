@@ -3,23 +3,58 @@
 {% block header %}
     {% load static %}
     <link rel="stylesheet" href="{% static 'index.css' %}">
+    <link rel='stylesheet' href='https://rawcdn.githack.com/SochavaAG/example-mycode/master/_common/css/reset.css'>
+    <link rel="stylesheet" href="{% static 'card/style.css' %}">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 {% endblock %}
 {% block body %}
+    <div class="ag-format-container">
+          <div class="ag-courses_box">
 {% if is_subject %}
     {% for subject in subjects %}
-        <form action="{% url 'home' %}" method="GET" class="subject_c">
-        <p>{{ subject.name }}</p>
-        <input type="hidden" value="{{ subject.id }}" name="subject">
-        <input type="hidden" value="false" name="is_subject">
-        <input type="submit" value="Выбрать предмет">
+        <form method="GET" class="subject_c">
+            <div class="ag-courses_item">
+              <a type="submit" href="{% url 'sub' pk=subject.id %}" class="ag-courses-item_link">
+                <div class="ag-courses-item_bg"></div>
+
+                <div class="ag-courses-item_title">
+                  {{ subject.name }}
+                </div>
+
+{#                <div class="ag-courses-item_date-box">#}
+{#                  Len Quiz:#}
+{#                  <span class="ag-courses-item_date">#}
+{#                    {{  }}#}
+{#                  </span>#}
+{#                </div>#}
+              </a>
+            </div>
         </form>
+
     {% endfor %}
 {% else %}
      {% for test in tests %}
-        <form action="{% url 'test' test_id=test.id %}" class="test_c">
-        <p>{{ test.name }}</p>
-        <input type="submit" value="Выбрать тест">
+        <form action="" class="test_c">
+            <div class="ag-courses_item">
+              <a type="submit" href="{% url 'test' test_id=test.id %}" class="ag-courses-item_link">
+                <div class="ag-courses-item_bg"></div>
+
+                <div class="ag-courses-item_title">
+                  {{ test.name }}
+                </div>
+
+                <div class="ag-courses-item_date-box">
+                Created:
+                  <span class="ag-courses-item_date">
+                    {{ test.created }}
+                  </span>
+                </div>
+              </a>
+            </div>
         </form>
     {% endfor %}
 {% endif %}
+
+              </div>
+        </div>
 {% endblock %}

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from core.models import Test, ClassRooms, Subject, ClassRoomsSubjects, Question, Variant
+from core.models import Test, ClassRooms, Subject, ClassRoomsSubjects, Question, Variant, Result
 
 
 def action(request, status, path, pk=None):
@@ -29,7 +29,7 @@ def action(request, status, path, pk=None):
                     return render(request, "pages/dashboard/new.html",
                                   {"classrooms": classrooms, "subjects": subjects, "action": "test"})
                 elif request.method == "POST":
-                    return redirect("/dashboard/")
+                    return redirect("dashboard")
             elif path == "subject":
                 if request.method == "GET":
                     classrooms = ClassRooms.objects.all()
@@ -55,23 +55,28 @@ def action(request, status, path, pk=None):
             if path == "subject":
                 subject = Subject.objects.get(id=pk)
                 subject.delete()
-                return redirect("/dashboard/list/subject/")
+                return redirect("dlist", tip=path)
             elif path == "classroom":
                 classroom = ClassRooms.objects.get(id=pk)
                 classroom.delete()
-                return redirect("/dashboard/list/classroom/")
+                return redirect("dlist", tip=path)
             elif path == "quiz":
                 test = Test.objects.get(id=pk)
                 test.delete()
-                return redirect("/dashboard/list/quiz/")
+                return redirect("dlist", tip=path)
             elif path == "question":
                 question = Question.objects.get(id=pk)
                 question.delete()
-                return redirect("/dashboard/list/question/")
+                return redirect("dlist", tip=path)
             elif path == "variant":
                 variant = Variant.objects.get(id=pk)
                 variant.delete()
-                return redirect("/dashboard/list/variant/")
+                return redirect("dlist", tip=path)
+            elif path == "result":
+                Result.objects.filter(pk=pk).delete()
+                return redirect("dlist", tip=path)
+            else:
+                return redirect("dlist", tip=path)
         else:
             return redirect("dlist", tip=path)
     else:
