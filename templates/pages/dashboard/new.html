@@ -1,6 +1,6 @@
 {% extends 'pages/dashboard/base.html' %}
 {% block header %}
-    <style>
+    <style xmlns="http://www.w3.org/1999/html">
         body {
             background-color: #f5f5f5;
         }
@@ -53,21 +53,23 @@
         </div>
     {% elif action == "subject"%}
         <div class="container">
-            <form id="addQuestionForm" method="post" action="{% url 'create_test' %}">
+            <form id="addQuestionForm" method="POST" action="{% url "action_no_pk" status="create" path="subject" %}">
                 {% csrf_token %}
-                Название урока: <label>
-                <input type="text" class="test" name="subject_name">
-                </label><button type="submit" class="btn btn-primary">Сохранить</button>
+                <p>Название урока: <label>
+                    <input type="text" class="test" name="subject_name"></label></p>
+                <div id="classroomsField"></div>
+                <button type="button" class="btn btn-success" onclick="addClassRoom()">Добавить класс</button>
+              <button type="submit" class="btn btn-primary">Сохранить</button>
+                
             </form>
         </div>
     {% elif action == "classroom" %}
         <div class="container">
-            <form id="addQuestionForm" method="post" action="{% url 'create_test' %}">
+            <form id="addQuestionForm" method="post" action="{% url "action_no_pk" status="create" path="classroom" %}">
+                Название класса: 
                 {% csrf_token %}
-                Название класса: <label>
+                <label>
                 <input type="text" class="test" name="classroom_name">
-                <div id="classroomsField"></div>
-                <button type="button" class="btn btn-success" onclick="addClassRoom()">Добавить класс</button>
                 </label><button type="submit" class="btn btn-primary">Сохранить</button>
             </form>
         </div>
@@ -98,17 +100,18 @@
                 </div>`;
             variantContainer.insertAdjacentHTML('beforeend', variantFieldHTML);
         }
-        let classroom_id;
+        let classroom_id = 0;
         let classroom_id_option;
         function addClassRoom(){
             const classroomCounter = document.getElementById('classroomsField');
             const classroomFieldHTML = `
-                    <select>
-                        {% for i in classrooms %}
-                            <option name=i.id>i.name</option>
+                    <select name="classroom_${classroom_id}">
+                        {% for class in classrooms %}
+                            <option value={{ class.id }}>{{ class.name }}</option>
                         {% endfor %}
                     </select>
             `;
+                    classroom_id++;
             classroomCounter.insertAdjacentHTML('beforeend', classroomFieldHTML);
         }
     </script>
