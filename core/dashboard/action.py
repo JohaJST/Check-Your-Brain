@@ -1,7 +1,9 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from core.models import Test, ClassRooms, Subject, ClassRoomsSubjects, Question, Variant, Result
+from core.models import Test, ClassRooms, Subject, ClassRoomsSubjects, Question, Variant, Result, User
 
 
+@login_required(login_url="login")
 def action(request, status, path, pk=None):
     if request.user.is_admin:
         if status == "start":
@@ -82,4 +84,17 @@ def action(request, status, path, pk=None):
         return redirect("home")
 
 
+@login_required(login_url="login")
+def form(req):
+    if req.user.is_admin:
+        if req.POST:
+            data = req.POST
+            User.objects.create_user(username=data["username"], name=data["first_name"],
+                                     last_name=data["last_name"], classroom_id=int(data["classroom"]),
+                                     ut=int(data["ut"]))
+            return redirect("dashboard")
+        c = ClassRooms.objects.all()
+    else:
+        return redirect("home")
+    return render(req, "pages/dashboard/form.html", {"classrooms": c})
 

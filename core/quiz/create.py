@@ -1,7 +1,9 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from core.models import ClassRooms, Subject, Question, Variant, Test, TestClassRoom
 
 
+@login_required(login_url="login")
 def new_test(request):
     is_subject = request.GET.get("is_subject")
     class_rooms = ClassRooms.objects.all()
@@ -9,6 +11,7 @@ def new_test(request):
     return render(request, "pages/dashboard/new.html", {"classrooms": class_rooms, "subjects": subjects})
 
 
+@login_required(login_url="login")
 def create_test(request):
     if request.method == 'POST':
         subject = Subject.objects.get(id=request.POST.get('subject'))

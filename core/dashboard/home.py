@@ -1,8 +1,10 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 from core.models import Test, Result, User, Subject
 
 
+@login_required(login_url="login")
 def home(requests):
     if requests.user.is_admin:
         q = Test.objects.all()

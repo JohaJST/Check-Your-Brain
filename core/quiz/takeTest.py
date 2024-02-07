@@ -9,6 +9,7 @@ from methodism import dictfetchall, dictfetchone
 from core.models import Test, Question, Variant, Subject, Result
 
 
+@login_required(login_url="login")
 def test_answer(request):
     current_user = request.user
     test_ = Test.objects.get(id=request.POST.get('test_id'))

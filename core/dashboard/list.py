@@ -1,7 +1,9 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from core.models import Subject, ClassRooms, Variant, Result, User, Test, Question
 
 
+@login_required(login_url="login")
 def dlist(request, tip=None):
     if request.user.is_admin:
         if tip == "subject":
