@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from core.models import Test, ClassRooms, Subject, ClassRoomsSubjects, Question, Variant
+from core.models import Test, ClassRooms, Subject, ClassRoomsSubjects, Question, Variant, Result
 
 
 def action(request, status, path, pk=None):
@@ -72,6 +72,10 @@ def action(request, status, path, pk=None):
                 variant = Variant.objects.get(id=pk)
                 variant.delete()
                 return redirect("/dashboard/list/variant/")
+            elif path == "result":
+                result = Result.objects.get(id=pk)
+                result.delete()
+                return redirect("/dashboard/list/result/")
         else:
             return redirect("dlist", tip=path)
     else:
