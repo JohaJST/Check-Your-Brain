@@ -9,7 +9,7 @@ from core.models import Subject, Result, Test
 
 
 @login_required(login_url="login")
-def index(request):
+def index(request, pk=None):
     sql = f"""
     SELECT s.id, s.name
     FROM core_classroomssubjects cs
@@ -23,9 +23,9 @@ def index(request):
     # print(subjects)
     # subjects = Subject.objects.all()
     # print("1")
-    if request.GET.get("is_subject") == "false":
-        tests = Test.objects.filter(subject_id=request.GET.get("subject"))
-        # print(tests)
+    if pk:
+        tests = Test.objects.filter(subject_id=pk)
+        print(tests)
         # print("11")
         return render(request, 'index.html', {'tests': tests})
     # print("2")
