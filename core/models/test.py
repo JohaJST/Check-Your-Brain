@@ -6,7 +6,6 @@ from core.models import ClassRooms, Subject, User
 class Test(models.Model):
     name = models.CharField(max_length=256)
     desc = models.TextField(null=True, blank=True)
-    classroom = models.ForeignKey(ClassRooms, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     is_start = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, auto_now=False, null=True, blank=True, editable=False)
@@ -54,3 +53,8 @@ class Result(models.Model):
 
     # def save(self, *args, **kwargs):
     #     self.foyiz = self.test.
+
+
+class TestClassRoom(models.Model):
+    test = models.ForeignKey(Test, on_delete=models.CASCADE)
+    classroom = models.ForeignKey(ClassRooms, on_delete=models.CASCADE)

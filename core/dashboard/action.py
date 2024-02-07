@@ -23,7 +23,6 @@ def action(request, status, path, pk=None):
         elif status == "create":
             if path == "test":
                 if request.method == "GET":
-                    is_subject = request.GET.get("is_subject")
                     classrooms = ClassRooms.objects.all()
                     subjects = Subject.objects.all()
                     return render(request, "pages/dashboard/new.html",
@@ -52,11 +51,11 @@ def action(request, status, path, pk=None):
                     return redirect("/dashboard/list/classroom/")
             return redirect("dlist", tip=path)
         elif status == "delete":
-            if path == "subject":
+            if path.lower() == "subject":
                 subject = Subject.objects.get(id=pk)
                 subject.delete()
                 return redirect("/dashboard/list/subject/")
-            elif path == "classroom":
+            elif path.lower() == "classroom":
                 classroom = ClassRooms.objects.get(id=pk)
                 classroom.delete()
                 return redirect("/dashboard/list/classroom/")
@@ -76,6 +75,3 @@ def action(request, status, path, pk=None):
             return redirect("dlist", tip=path)
     else:
         return redirect("home")
-
-
-

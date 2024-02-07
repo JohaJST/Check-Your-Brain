@@ -12,7 +12,10 @@ def home(requests):
         a = 0
         for i in r:
             a += int(i.foyiz)
-        tmp = a // len(r)
+        if a != 0:
+            tmp = a // len(r)
+        else:
+            tmp = 100
         return render(requests, 'pages/dashboard/index.html', {"qlen": len(q), "rlen": tmp, "ulen": len(u), "slen": len(s)})
     else:
         return redirect("home")

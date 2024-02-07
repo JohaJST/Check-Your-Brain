@@ -43,7 +43,12 @@
                 Название теста: <label>
                 <input type="text" class="test" name="test_name">
                 <select name="subject"><option value="">-- Выберите урок --</option>{% for subject in subjects %}<option value={{ subject.id }}>{{ subject.name }}</option>{% endfor %}</select>
-                <select name="classroom"><option value="">-- Выберите класс --</option>{% for classroom in classrooms %}<option value={{ classroom.id }}>{{ classroom.name }}</option>{% endfor %}</select>
+                <select name="classroom_1"><option value="">-- Выберите класс --</option>{% for classroom in classrooms %}<option value={{ classroom.id }}>{{ classroom.name }}</option>{% endfor %}</select>
+                <select name="classroom_2"><option value="">-- Выберите класс --</option>{% for classroom in classrooms %}<option value={{ classroom.id }}>{{ classroom.name }}</option>{% endfor %}</select>
+                <select name="classroom_3"><option value="">-- Выберите класс --</option>{% for classroom in classrooms %}<option value={{ classroom.id }}>{{ classroom.name }}</option>{% endfor %}</select>
+                <select name="classroom_4"><option value="">-- Выберите класс --</option>{% for classroom in classrooms %}<option value={{ classroom.id }}>{{ classroom.name }}</option>{% endfor %}</select>
+
+
             </label>
                 {% csrf_token %}
                 <div id="questionFields"></div>
@@ -57,7 +62,14 @@
                 {% csrf_token %}
                 <p>Название урока: <label>
                     <input type="text" class="test" name="subject_name"></label></p>
-                <div id="classroomsField"></div>
+                <div id="classroomsField">
+                    <select name="classroom_0">
+                        {% for class in classrooms %}
+                            <option value={{ class.id }}>{{ class.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
                 <button type="button" class="btn btn-success" onclick="addClassRoom()">Добавить класс</button>
               <button type="submit" class="btn btn-primary">Сохранить</button>
                 
@@ -100,7 +112,7 @@
                 </div>`;
             variantContainer.insertAdjacentHTML('beforeend', variantFieldHTML);
         }
-        let classroom_id = 0;
+        let classroom_id = 1;
         let classroom_id_option;
         function addClassRoom(){
             const classroomCounter = document.getElementById('classroomsField');

@@ -72,7 +72,7 @@
                         <tr role="row" class="odd">
                           <td>{{ i.name }}</td>
                           <td>
-                           <a href="{% url "action" status="delete" path="subject" pk=i.id %}" class="btn btn-danger ml-4 btn-circle btn-wd">
+                           <a href="{% url "action" status="delete" path=name pk=i.id %}" class="btn btn-danger ml-4 btn-circle btn-wd">
                                <i class="fa fa-trash"></i>
                            </a>
                           </td>
