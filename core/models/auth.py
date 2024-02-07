@@ -21,7 +21,7 @@ class CustomUserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=256, unique=True)
-    name = models.CharField(max_length=256, null=True)
+    name = models.CharField(max_length=256, default=" ")
     last_name = models.CharField(max_length=256, null=True)
     classroom = models.ForeignKey(ClassRooms, on_delete=models.SET_NULL, null=True, blank=True)
     just = models.BooleanField(default=False)

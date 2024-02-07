@@ -38,8 +38,9 @@
         {% if user.is_admin %}
             <a href="{% url 'dashboard' %}">Панель управления</a>
         {% endif %}
+        <a href="{% url 'logout' %}">Выйти</a>
         <div class="user-date">
-            <a href="{% url 'logout' %}">{{ user.name }}</a>
+            <a href="{% url 'user_profile' %}">{{ user.name }}</a>
         </div>
     </div>
     

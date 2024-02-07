@@ -38,6 +38,6 @@ def create_test(request):
 
             question_counter += 1
 
-        return redirect('/')
-    return redirect("/")
+        return redirect('dashboard')
+    return redirect("dashboard")
 
