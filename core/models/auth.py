@@ -21,13 +21,13 @@ class CustomUserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=256, unique=True)
-    name = models.CharField(max_length=256, default=" ")
+    name = models.CharField(max_length=256, default=" ", null=True)
     last_name = models.CharField(max_length=256, null=True)
-    classroom = models.ForeignKey(ClassRooms, on_delete=models.SET_NULL, null=True, blank=True)
+    classroom = models.ForeignKey(ClassRooms, on_delete=models.SET_NULL, null=True)
     just = models.BooleanField(default=False)
 
-    log = models.JSONField(default={'state': 0})
-    lang = models.CharField(default='uz', max_length=2, choices=[("uz", 'uz'), ("ru", 'ru'), ("en", 'en'), ])
+    log = models.JSONField(default={'state': 0}, null=True)
+    lang = models.CharField(default='uz', max_length=2, choices=[("uz", 'uz'), ("ru", 'ru'), ("en", 'en'),], null=True)
     ut = models.SmallIntegerField(verbose_name="User Type", default=3, choices=[
         (1, 'Admin'),
         (2, "Teacher"),

