@@ -39,7 +39,7 @@
             <a href="{% url 'dashboard' %}">Панель управления</a>
         {% endif %}
         <div class="user-date">
-            <a href="{# url 'user_profile' #}">{{ user.name }}</a>
+            <a href="{% url 'logout' %}">{{ user.name }}</a>
         </div>
     </div>
     
