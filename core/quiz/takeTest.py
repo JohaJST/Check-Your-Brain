@@ -30,18 +30,21 @@ def test(request, test_id):
         foyiz = int(data["result"]) * 100 / totalQuestion["count(*)"]
         Result.objects.create(test_id=test_id, user=request.user, result=int(data["result"]), foyiz=foyiz, totalQuestions=totalQuestion["count(*)"])
         return redirect("home")
-    # try:
-    question = Question.objects.filter(test_id=test_id)
+    try:
+        question = Question.objects.filter(test_id=test_id)
     # print(question)
-    variant = Variant.objects.all()
+        variant = Variant.objects.all()
+
     # print(variant)
     # answer = Variant.objects.filter(is_answer=True)
     # print(answer)
-    ctx = {"question": question,
-           # "answer": answer,
-           "variant": variant,
-           "test": Test.objects.get(id=test_id)
-           }
+        ctx = {"question": question,
+               # "answer": answer,
+               "variant": variant,
+               "test": Test.objects.get(id=test_id)
+               }
+    except:
+        return redirect("home")
     #     return redirect("home")
     return render(request, 'test.html', ctx)
 

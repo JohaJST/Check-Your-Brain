@@ -35,7 +35,7 @@ def action(request, status, path, pk=None):
                     return render(request, "pages/dashboard/new.html",
                                   {"classrooms": classrooms, "subjects": subjects, "action": "test"})
                 elif request.method == "POST":
-                    return redirect("/dashboard/")
+                    return redirect("dashboard")
             elif path == "subject":
                 if request.method == "GET":
                     classrooms = ClassRooms.objects.all()
@@ -48,40 +48,45 @@ def action(request, status, path, pk=None):
                         clsb = ClassRoomsSubjects.objects.create(classroom_id=ClassRooms.objects.get(id=request.POST.get(f'classroom_{classroom_id}')).id, subject_id=subject.id)
                         clsb.save()
                         classroom_id += 1
-                    return redirect("/dashboard/list/subject/")
+                    return redirect("dlist", tip=path)
             elif path == "classroom":
                 if request.method == "GET":
                     return render(request, "pages/dashboard/new.html", {"action": "classroom"})
                 elif request.method == "POST":
                     class_room = ClassRooms.objects.create(name=request.POST.get("classroom_name"))
                     class_room.save()
-                    return redirect("/dashboard/list/classroom/")
+                    return redirect("dlist", tip=path)
             return redirect("dlist", tip=path)
         elif status == "delete":
             if path == "subject":
                 subject = Subject.objects.get(id=pk)
                 subject.delete()
-                return redirect("/dashboard/list/subject/")
+                return redirect("dlist", tip=path)
             elif path == "classroom":
                 classroom = ClassRooms.objects.get(id=pk)
                 classroom.delete()
-                return redirect("/dashboard/list/classroom/")
+                return redirect("dlist", tip=path)
             elif path == "quiz":
                 test = Test.objects.get(id=pk)
                 test.delete()
-                return redirect("/dashboard/list/quiz/")
+                return redirect("dlist", tip=path)
             elif path == "question":
                 question = Question.objects.get(id=pk)
                 question.delete()
-                return redirect("/dashboard/list/question/")
+                return redirect("dlist", tip=path)
             elif path == "variant":
                 variant = Variant.objects.get(id=pk)
                 variant.delete()
-                return redirect("/dashboard/list/variant/")
+                return redirect("dlist", tip=path)
             elif path == "result":
                 result = Result.objects.get(id=pk)
                 result.delete()
-                return redirect("/dashboard/list/result/")
+                return redirect("dlist", tip=path)
+            elif path == "user":
+                User.objects.filter(id=pk).delete()
+                return redirect("dlist", tip=path)
+            else:
+                return redirect("dlist", tip=path)
         else:
             return redirect("dlist", tip=path)
     else:
@@ -96,7 +101,7 @@ def form(req):
             User.objects.create_user(username=data["username"], name=data["first_name"],
                                      last_name=data["last_name"], classroom_id=int(data["classroom"]),
                                      ut=int(data["ut"]))
-            return redirect("dashboard")
+            return redirect("userform")
         c = ClassRooms.objects.all()
     else:
         return redirect("home")

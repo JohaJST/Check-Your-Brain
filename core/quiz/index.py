@@ -24,8 +24,16 @@ def index(request, pk=None):
     # subjects = Subject.objects.all()
     # print("1")
     if pk:
-        tests = Test.objects.filter(subject_id=pk)
-        print(tests)
+        sql = f"""select ct.id, ct.name, ct.desc, ct.created from core_testclassroom tc
+                inner join main.core_test ct on tc.test_id = ct.id
+            inner join main.core_classroomssubjects cc on cc.classroom_id = tc.classroom_id and cc.subject_id = ct.subject_id
+            where tc.classroom_id = {request.user.classroom_id} and cc.subject_id = {pk} and cc.classroom_id = {request.user.classroom_id}
+"""
+        with closing(connection.cursor()) as cursor:
+            cursor.execute(sql)
+            tests = dictfetchall(cursor)
+        # tests = Test.objects.filter(subject_id=pk)
+        # print(tests)
         # print("11")
         return render(request, 'index.html', {'tests': tests})
     # print("2")

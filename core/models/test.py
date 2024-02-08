@@ -13,11 +13,10 @@ class Test(models.Model):
     def __str__(self):
         return self.name
 
-    # def save(self, *args, **kwargs):
-    #     a = 0
-    #     for i in Question.objects.get(test_id=self.id):
-    #         a += 1
-    #
+    def save(self, *args, **kwargs):
+        if self.desc is None:
+            self.desc = " "
+        return super(Test, self).save(*args, **kwargs)
 
 
 class Question(models.Model):
@@ -58,3 +57,6 @@ class Result(models.Model):
 class TestClassRoom(models.Model):
     test = models.ForeignKey(Test, on_delete=models.CASCADE)
     classroom = models.ForeignKey(ClassRooms, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.test} | {self.classroom}"

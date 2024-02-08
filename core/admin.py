@@ -4,10 +4,11 @@ from django.contrib import admin
 from django.db import connection
 from methodism import dictfetchone
 
-from core.models import User, ClassRooms, Subject, Variant, Question, Test, Result, ClassRoomsSubjects
+from core.models import User, ClassRooms, Subject, Variant, Question, Test, Result, ClassRoomsSubjects, TestClassRoom
 
 
 admin.site.register(User)
+admin.site.register(TestClassRoom)
 admin.site.register(ClassRooms)
 admin.site.register(Subject)
 admin.site.register(Test)
