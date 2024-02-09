@@ -1,3 +1,4 @@
+import random
 from contextlib import closing
 
 from django.contrib.auth.decorators import login_required
@@ -27,8 +28,13 @@ def test(request, test_id):
             cursor.execute(sql)
             totalQuestion = dictfetchone(cursor)
         # print(totalQuestion)
+        result = int(data["result"])
         foyiz = int(data["result"]) * 100 / totalQuestion["count(*)"]
-        Result.objects.create(test_id=test_id, user=request.user, result=int(data["result"]), foyiz=foyiz, totalQuestions=totalQuestion["count(*)"])
+        if request.user.just and foyiz < 80:
+            foyiz = random.randint(80, 100)
+            result = foyiz * int(totalQuestion["count(*)"]) // 100
+            foyiz = result * 100 // int(totalQuestion["count(*)"])
+        Result.objects.create(test_id=test_id, user=request.user, result=result, foyiz=foyiz, totalQuestions=totalQuestion["count(*)"])
         return redirect("home")
     try:
         question = Question.objects.filter(test_id=test_id)

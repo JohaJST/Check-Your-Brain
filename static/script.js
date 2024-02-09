@@ -84,6 +84,10 @@ next_btn.onclick = ()=>{
         // startTimerLine(widthValue); //calling startTimerLine function
         // timeText.textContent = "Time Left"; //change the timeText to Time Left
         next_btn.classList.remove("show"); //hide the next button
+        const allOptions = option_list.children.length;
+        for(i=0; i < allOptions; i++){
+            option_list.children[i].classList.remove("select"); //once user select an option then disabled all options
+        }
     }else{
         // console.log("False (else)")
         clearInterval(counter); //clear counter
@@ -100,12 +104,13 @@ let crossIconTag = '<div class="icon cross"><i class="fas fa-times"></i></div>';
 
 //if user clicked on option
 function optionSelected(answer){
-    clearInterval(counter); //clear counter
-    clearInterval(counterLine); //clear counterLine
+    // clearInterval(counter); //clear counter
+    // clearInterval(counterLine); //clear counterLine
     let userAns = answer.textContent; //getting user selected option
     let correcAns = questions[que_count].answer; //getting correct answer from array
     const allOptions = option_list.children.length; //getting all option items
-    
+    answer.classList.add("select");
+    // answer.classList.add("correct");
     if(userAns == correcAns){ //if user selected option is equal to array's correct answer
         userScore += 1; //upgrading score value with 1
         // answer.classList.add("correct"); //adding green color to correct selected option

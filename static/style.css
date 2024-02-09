@@ -215,6 +215,12 @@ section .option_list .option:hover{
     border: 1px solid #b8daff;
 }
 
+section .option_list .option.select{
+    color: #004085;
+    background: #cce5ff;
+    border: 1px solid #b8daff;
+}
+
 section .option_list .option.correct{
     color: #155724;
     background: #d4edda;
