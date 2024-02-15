@@ -9,22 +9,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
 </head>
 <body>
+    <style>
+        a{
+        text-decoration: None;
+        }
+    </style>
     {% if test.is_start %}
     <!-- start Quiz button -->
-        <div class="start_btn"><button>Start Quiz</button></div>
+        <div class="start_btn"><button>Начать Тест</button></div>
     
         <!-- Info Box -->
         <div class="info_box">
-            <div class="info-title"><span>Some Rules of this Quiz</span></div>
+            <div class="info-title"><span>Правила теста</span></div>
             <div class="info-list">
                 <div class="info">1. После того как вы выберете ответ, его нельзя будет отменить.</div>
-                <div class="info">2. Вы получите баллы за правильные ответы</div>
-                <div class="info">3. Сколько баллов вы набрали можно будет посмотреть когда вы закончите тест</div>
+                <div class="info">2. После оканчение теста нвжмите на кнопку выйти</div>
+                <div class="info">3. Вы получите баллы за правильные ответы</div>
+                <div class="info">4. Сколько баллов вы набрали можно будет посмотреть когда вы закончите тест</div>
 
             </div>
             <div class="buttons">
-                <button class="quit">Exit Quiz</button>
-                <button class="restart">Continue</button>
+                <button class="quit"><a href="{% url 'home' %}">Выйти</a></button>
+                <button class="restart">Далее</button>
             </div>
         </div>
     
@@ -50,7 +56,7 @@
                 <div class="total_que">
                     <!-- Here I've inserted Question Count Number from JavaScript -->
                 </div>
-                <button class="next_btn">Next Que</button>
+                <button class="next_btn">Cледуюший вопрос</button>
             </footer>
         </div>
     
@@ -59,7 +65,7 @@
             <div class="icon">
                 <i class="fas fa-crown"></i>
             </div>
-            <div class="complete_text">You've completed the Quiz!</div>
+            <div class="complete_text">Тест закончен</div>
             <div class="score_text">
                 <!-- Here I've inserted Score Result from JavaScript -->
             </div>
@@ -68,7 +74,7 @@
                     {% csrf_token %}
         {#            <button class="restart">Replay Quiz</button>#}
                         <div class="result_for_backend"></div>
-                    <button type="submit" class="quit">Quit Quiz</button>
+                    <button type="submit" class="quit">Выйти</button>
                 </form>
             </div>
         </div>

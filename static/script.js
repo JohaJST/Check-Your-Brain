@@ -147,12 +147,12 @@ function showResult(){
     // form.submit();
      // if user scored more than 3
         //creating a new span tag and passing the user score number and total question number
-    let scoreTag = '<span>You got <p>'+ userScore +'</p> out of <p>'+ questions.length +'</p></span>';
+    let scoreTag = '<span>Вы набрали <p>'+ userScore +'</p> из <p>'+ questions.length +'</p></span>';
     scoreText.innerHTML = scoreTag;  //adding new span tag inside score_Text
 }
 
 function queCounter(index){
     //creating a new span tag and passing the question number and total question
-    let totalQueCounTag = '<span><p>'+ index +'</p> of <p>'+ questions.length +'</p> Questions</span>';
+    let totalQueCounTag = '<span><p>'+ index +'</p> вопрос из <p>'+ questions.length;
     bottom_ques_counter.innerHTML = totalQueCounTag;  //adding new span tag inside bottom_ques_counter
 }
