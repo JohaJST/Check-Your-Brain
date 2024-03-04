@@ -9,7 +9,7 @@ from django.db import connection
 
 @login_required(login_url="login")
 def action(request, status, path, pk=None):
-    if request.user.is_admin:
+    if request.user.in_dashboard:
         if status == "start":
             try:
                 t = Test.objects.filter(pk=pk).first()
@@ -45,7 +45,9 @@ def action(request, status, path, pk=None):
                     subject.save()
                     classroom_id = 0
                     while f'classroom_{classroom_id}' in request.POST:
-                        clsb = ClassRoomsSubjects.objects.create(classroom_id=ClassRooms.objects.get(id=request.POST.get(f'classroom_{classroom_id}')).id, subject_id=subject.id)
+                        clsb = ClassRoomsSubjects.objects.create(
+                            classroom_id=ClassRooms.objects.get(id=request.POST.get(f'classroom_{classroom_id}')).id,
+                            subject_id=subject.id)
                         clsb.save()
                         classroom_id += 1
                     return redirect("dlist", tip=path)
@@ -90,12 +92,12 @@ def action(request, status, path, pk=None):
         else:
             return redirect("dlist", tip=path)
     else:
-        return redirect("home")
+        return redirect("locked")
 
 
 @login_required(login_url="login")
 def form(req):
-    if req.user.is_admin:
+    if req.user.in_dashboard:
         if req.POST:
             data = req.POST
             User.objects.create_user(username=data["username"], name=data["first_name"],
@@ -104,8 +106,9 @@ def form(req):
             return redirect("userform")
         c = ClassRooms.objects.all()
     else:
-        return redirect("home")
+        return redirect("locked")
     return render(req, "pages/dashboard/form.html", {"classrooms": c})
+
 
 def userJust():
     c = f"""

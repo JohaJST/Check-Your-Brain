@@ -14,10 +14,10 @@ def sign_in(requests):
         user = User.objects.filter(username=data['username']).first()
 
         if not user:
-            return render(requests, 'pages/auth/login.html', {"error": "Username xato"})
+            return render(requests, 'pages/auth/login.html', {"error": "Username не найдено"})
 
         if not user.is_active:
-            return render(requests, 'pages/auth/login.html', {"error": "Profil active emas "})
+            return render(requests, 'pages/auth/login.html', {"error": "Профиль не активен"})
         login(requests, user)
         return redirect('home')
 
@@ -135,5 +135,7 @@ def regis(request):
 
 @login_required(login_url='login')
 def sign_out(request):
+    u = request.user.in_dashboard = False
+    u.save()
     logout(request)
     return redirect("login")

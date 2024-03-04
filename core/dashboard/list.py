@@ -5,7 +5,7 @@ from core.models import Subject, ClassRooms, Variant, Result, User, Test, Questi
 
 @login_required(login_url="login")
 def dlist(request, tip=None):
-    if request.user.is_admin:
+    if request.user.in_dashboard:
         if tip == "subject":
             subjects = Subject.objects.all()
             return render(request, 'pages/dashboard/list.html', {"name": "Subject", "root": subjects})
@@ -27,4 +27,4 @@ def dlist(request, tip=None):
             return render(request, 'pages/dashboard/new.html', {"subjects": Subject.objects.all(), "classrooms": ClassRooms.objects.all()})
         return render(request, 'pages/dashboard/list.html')
     else:
-        return redirect('home')
+        return redirect('locked')
