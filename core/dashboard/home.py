@@ -27,10 +27,10 @@ def home(requests):
 @login_required(login_url="login")
 def locked(request):
     if request.method == "POST":
-        # shotta parol tekshirish kere
-        # if request.POST.get("pass") == request.user.
-        a = request.user.in_dashboard = True
-        a.save()
+        # s
+
+        request.user.in_dashboard = request.user.check_password(request.POST.get("pass"))
+        request.user.save()
         return redirect("dashboard")
     elif not request.user.is_admin:
         return redirect("home")

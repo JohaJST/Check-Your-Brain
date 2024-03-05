@@ -39,6 +39,7 @@
                                  <p>Ведите пароль для дашбоарда</p>
                               </div>
                               <form method="post">
+                                  {% csrf_token %}
                                  <div class="row">
                                     <div class="col-lg-12">
                                        <div class="form-group">

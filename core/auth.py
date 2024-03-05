@@ -135,7 +135,7 @@ def regis(request):
 
 @login_required(login_url='login')
 def sign_out(request):
-    u = request.user.in_dashboard = False
-    u.save()
+    request.user.in_dashboard = False
+    request.user.save()
     logout(request)
     return redirect("login")
