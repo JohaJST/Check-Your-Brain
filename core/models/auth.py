@@ -25,6 +25,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=256, null=True)
     classroom = models.ForeignKey(ClassRooms, on_delete=models.SET_NULL, null=True)
     just = models.BooleanField(default=False)
+    birthday = models.DateTimeField(null=True)
+    phone = models.CharField(max_length=20, null=True)
 
     log = models.JSONField(default={'state': 0}, null=True)
     lang = models.CharField(default='uz', max_length=2, choices=[("uz", 'uz'), ("ru", 'ru'), ("en", 'en'),], null=True)
@@ -103,18 +105,13 @@ class Otp(models.Model):
 class TG_User(models.Model):
     user_id = models.BigIntegerField(unique=True)
     phone = models.CharField('Phone', unique=True, max_length=50)
-    username = models.CharField(max_length=128)
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    classroom = models.ForeignKey(ClassRooms, on_delete=models.SET_NULL, null=True, blank=True)
+    username = models.CharField(max_length=128, null=True)
+    first_name = models.CharField(max_length=255, null=True)
+    last_name = models.CharField(max_length=255, null=True)
 
     log = models.JSONField(default={'state': 0})
     lang = models.CharField(default='uz', max_length=2, choices=[("uz", 'uz'), ("ru", 'ru'), ("en", 'en'), ])
-    ut = models.SmallIntegerField(verbose_name="User Type", default=3, choices=[
-        (1, 'Admin'),
-        (2, "Teacher"),
-        (3, "User"),
-    ])  # user type
+
     is_admin = models.BooleanField(default=False)
 
     created = models.DateTimeField(auto_now_add=True, auto_now=False, null=True, editable=False)
@@ -127,21 +124,14 @@ class TG_User(models.Model):
         return f"{self.last_name} {self.first_name}"
 
     def tg_user_format(self):
-        ut = {
-            1: 'Admin',
-            2: "Teacher",
-            3: "User",
-        }[self.ut]
         return {
             "tg_user_id": self.user_id,
             'mobile': self.phone,
             'username': self.username,
-            "ClassRoom": self.classroom,
             'first_name': self.first_name,
             'last_name': self.last_name,
             'lang': self.lang,
             "log": self.log,
-            'user_type': ut,
             "created": self.created,
             "updated": self.updated
         }
