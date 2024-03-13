@@ -25,7 +25,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=256, null=True)
     classroom = models.ForeignKey(ClassRooms, on_delete=models.SET_NULL, null=True)
     just = models.BooleanField(default=False)
-    birthday = models.DateTimeField(null=True)
+    birthday = models.DateField(null=True)
     phone = models.CharField(max_length=20, null=True)
 
     log = models.JSONField(default={'state': 0}, null=True)

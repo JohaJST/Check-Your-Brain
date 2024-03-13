@@ -21,11 +21,10 @@ def key_btn(type, ctg=None):
                 [KeyboardButton(classrooms[len(classrooms)-1].name)]
             )
     elif type == "user":
-        cr = ClassRooms.objects.filter(name=ctg).first()
-        classrooms = User.objects.filter(classroom=cr)
-        for i in range(1, len(classrooms), 2):
-            btn += [KeyboardButton(classrooms[i - 1].name), KeyboardButton(classrooms[i].full_name())],
 
+        classrooms = User.objects.filter(classroom=ctg)
+        for i in range(1, len(classrooms), 2):
+            btn += [KeyboardButton(classrooms[i - 1].full_name()), KeyboardButton(classrooms[i].full_name())],
         if not len(classrooms) % 2 == 0:
             btn.append(
                 [KeyboardButton(classrooms[len(classrooms)-1].full_name())]
