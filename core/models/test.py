@@ -45,7 +45,7 @@ class Result(models.Model):
     totalQuestions = models.IntegerField(null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     test = models.ForeignKey(Test, on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True, auto_now=False, null=True, blank=True, editable=False)
+    created = models.DateField(auto_now_add=True, auto_now=False, null=True, blank=True, editable=False)
 
     def __str__(self):
         return f"{self.user} | {self.result} {self.test}"

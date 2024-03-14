@@ -3,7 +3,7 @@ from contextlib import closing
 from django.db import connection
 from methodism.helper import dictfetchall, dictfetchone
 
-from core.models import User, TG_User, ClassRooms
+from core.models import User, TG_User, ClassRooms, Result
 from telegram import Update, Bot, ReplyKeyboardRemove
 from bot.btn import key_btn
 
@@ -33,6 +33,16 @@ def msg_handler(update: Update, context):
     log = user.log
     # print(1)
     if log["state"] == 3:
+        a = User.objects.filter(phone=user.phone)
+        if a:
+            for j in a:
+                r = Result.objects.filter(user=j)
+                for i in r:
+                    update.message.reply_text(f"Ученик(ца): {i.user.full_name()}\n"
+                                              f"Предмет: {i.test.subject}\n"
+                                              f"Тест: {i.test.name}\n"
+                                              f"{i.result} правельных ответов из {i.totalQuestions}({i.foyiz}%)\n"
+                                              f"Дата: {i.created}\n")
         update.message.reply_text("Выберите класс", reply_markup=key_btn("classrooms"))
         log["state"] = 4
         user.save()
@@ -66,19 +76,35 @@ def msg_handler(update: Update, context):
 
     elif log["state"] == 6:
         suser = User.objects.filter(id=log["userid"]).first()
+        try:
+            d = suser.birthday.strftime("%d.%m.%Y")
+        except:
+            update.message.reply_text("У ученика(цы) нету день рождение в дата базе", reply_markup=key_btn("menu"))
+            user.log["state"] = 3
+            user.save()
+            return 0
         # print(suser.birthday.strftime("%d.%m.%Y"))
         # print(suser.birthday.day, suser.birthday.month, suser.birthday.year)
         # print(smsg[0], smsg[1], smsg[2])
-        if suser and msg == suser.birthday.strftime("%d.%m.%Y"):
-            print("Tori")
-            update.message.reply_text("Правильно")
+        if suser and msg == d:
+            # print("Tori")
+            r = Result.objects.filter(user=suser)
+            for i in r:
+                update.message.reply_text(f"Ученик(ца): {i.user.full_name()}\n"
+                                          f"Предмет: {i.test.subject}\n"
+                                          f"Тест: {i.test.name}\n"
+                                          f"{i.result} правельных ответов из {i.totalQuestions}({i.foyiz}%)\n"
+                                          f"Дата: {i.created}\n")
             # shotta test resultari jonatiladi
+            update.message.reply_text("Menu", reply_markup=key_btn("menu"))
+            user.log["state"] = 3
+            user.save()
             return 0
         # print(suser.birthday)
         # print(suser.birthday.day)
         # print(suser.birthday.month)
         # print(suser.birthday.year)
-        print("notori")
+        # print("notori")
         update.message.reply_text("День рождения не правельно")
         return 0
     # print(3)

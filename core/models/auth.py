@@ -42,7 +42,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
-    created = models.DateTimeField(auto_now_add=True, auto_now=False, null=True, editable=False)
+    created = models.DateField(auto_now_add=True, auto_now=False, null=True, editable=False)
     updated = models.DateTimeField(auto_now_add=False, auto_now=True, null=True)
     objects = CustomUserManager()
 
