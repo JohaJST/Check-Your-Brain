@@ -4,8 +4,8 @@ from django.contrib import admin
 from django.db import connection
 from methodism import dictfetchone
 
-from core.models import TG_User, User, ClassRooms, Subject, Variant, Question, Test, Result, ClassRoomsSubjects, TestClassRoom
-
+from core.models import TG_User, User, ClassRooms, Subject, Variant, Question, Test, Result, ClassRoomsSubjects, \
+    TestClassRoom, OldResult
 
 admin.site.register(TG_User)
 admin.site.register(User)
@@ -16,6 +16,7 @@ admin.site.register(Test)
 admin.site.register(Question)
 admin.site.register(Variant)
 admin.site.register(Result)
+admin.site.register(OldResult)
 admin.site.register(ClassRoomsSubjects)
 
 def userJust():

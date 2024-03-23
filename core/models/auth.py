@@ -73,7 +73,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         }
 
     def __str__(self):
-        return f"{self.id} || {self.full_name()} || {self.username}"
+        return f"{self.full_name()} || {self.username}"
 
 
 class Otp(models.Model):

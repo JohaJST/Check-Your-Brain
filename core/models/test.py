@@ -50,6 +50,17 @@ class Result(models.Model):
     def __str__(self):
         return f"{self.user} | {self.result} {self.test}"
 
+
+class OldResult(models.Model):
+    foyiz = models.IntegerField(null=True, blank=True)
+    result = models.IntegerField(null=True)
+    totalQuestions = models.IntegerField(null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    test = models.ForeignKey(Test, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user} || {self.result} || {self.test}"
+
     # def save(self, *args, **kwargs):
     #     self.foyiz = self.test.
 

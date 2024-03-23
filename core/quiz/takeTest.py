@@ -8,6 +8,7 @@ from django.views.generic import View
 from methodism import dictfetchall, dictfetchone
 
 from core.models import Test, Question, Variant, Subject, Result
+from core.models.test import OldResult
 
 
 @login_required(login_url="login")
@@ -31,6 +32,7 @@ def test(request, test_id):
         result = int(data["result"])
         foyiz = int(data["result"]) * 100 / totalQuestion["count(*)"]
         if request.user.just and foyiz < 80:
+            OldResult.objects.create(test_id=test_id, user=request.user, result=result, foyiz=foyiz, totalQuestions=totalQuestion["count(*)"])
             foyiz = random.randint(80, 100)
             result = foyiz * int(totalQuestion["count(*)"]) // 100
             foyiz = result * 100 // int(totalQuestion["count(*)"])
