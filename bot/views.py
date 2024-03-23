@@ -37,6 +37,8 @@ def msg_handler(update: Update, context):
         if a:
             for j in a:
                 r = Result.objects.filter(user=j)
+                log["users"] += j.full_name()
+                user.save()
                 for i in r:
                     update.message.reply_text(f"Ученик(ца): {i.user.full_name()}\n"
                                               f"Предмет: {i.test.subject}\n"
@@ -87,6 +89,8 @@ def msg_handler(update: Update, context):
         # print(suser.birthday.day, suser.birthday.month, suser.birthday.year)
         # print(smsg[0], smsg[1], smsg[2])
         if suser and msg == d:
+            log["users"] += suser.full_name()
+            user.save()
             # print("Tori")
             r = Result.objects.filter(user=suser)
             for i in r:

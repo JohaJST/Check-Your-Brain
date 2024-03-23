@@ -5,6 +5,8 @@
   <meta charset="UTF-8">
   <title>Login Page</title>
   <link rel="stylesheet" href="{% static 'auth/style.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="{# static 'auth/script.js' #}"></script>
 </head>
 
 <body>
@@ -280,8 +282,15 @@
             <form method="post" class="form_form">
                 {% csrf_token %}
                 <div class="inputBox">
-                    <input type="text" name="username" required>
-                    <i>Username</i>
+                    <select name="classroom" id="mainSelect" onchange="updateOptions()">
+                        <option disabled="" selected="">Select ClassRoom</option>
+                        {% for i in c %}
+                            <option value="{{ i.id }}">{{ i.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+                    <select name="user" id="dependentSelect"></select>
+
                   </div>
 <!--                <div class="links" style="margin-top: 20px;">-->
 <!--&lt;!&ndash;                    <a href="#">Forgot Password</a>&ndash;&gt;-->
@@ -296,6 +305,34 @@
     </div>
   </section>
 <!-- partial -->
-  
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+<script>
+    const optionsData = {
+        {% for i in c %}
+            {{ i.id }}: [
+            {% for j in u %}
+                {% if j.classroom.id == i.id %}
+                    '{{ j.full_name }}',
+                {% endif %}
+            {% endfor %}
+            ],
+        {% endfor %}
+    };
+
+    function updateOptions() {
+        const mainSelect = document.getElementById('mainSelect');
+        const dependentSelect = document.getElementById('dependentSelect');
+        const selectedCategory = mainSelect.value;
+
+        // Clear existing options
+        dependentSelect.innerHTML = '';
+
+        // Populate options based on JSON data
+        optionsData[selectedCategory].forEach(option => {
+            dependentSelect.add(new Option(option, option.replace(' ', '.')));
+        });
+    }
+</script>
 </body>
 </html>

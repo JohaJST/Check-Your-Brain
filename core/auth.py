@@ -8,20 +8,28 @@ from core.models import User, ClassRooms
 def sign_in(requests):
     if not requests.user.is_anonymous:
         return redirect("home")
-
+    ctx = {
+        "u": User.objects.all(),
+        "c": ClassRooms.objects.all()
+    }
     if requests.POST:
         data = requests.POST
-        user = User.objects.filter(username=data['username']).first()
+        n = data["user"].split(".")
+        print(n)
+        user = User.objects.filter(last_name=n[0], name=n[1]).first()
 
         if not user:
-            return render(requests, 'pages/auth/login.html', {"error": "Username не найдено"})
+            ctx["error"] = "Ученик(ца) не найдено"
+            return render(requests, 'pages/auth/login.html', ctx)
 
         if not user.is_active:
-            return render(requests, 'pages/auth/login.html', {"error": "Профиль не активен"})
+
+            ctx["error"] = "Профиль не активен"
+            return render(requests, 'pages/auth/login.html', ctx)
         login(requests, user)
         return redirect('home')
 
-    return render(requests, 'pages/auth/login.html')
+    return render(requests, 'pages/auth/login.html', ctx)
 
 
 def regis(request):
