@@ -1,25 +1,28 @@
+from contextlib import closing
+
 from django.contrib.auth.decorators import login_required
+from django.db import connection
 from django.shortcuts import redirect, render
+from methodism import dictfetchone, dictfetchall
 
 from core.models import Test, Result, User, Subject
 
 
 @login_required(login_url="login")
-def home(requests):
+def home(requests, status="subject"):
     if requests.user.in_dashboard:
-        q = Test.objects.all()
-        r = Result.objects.all()
-        u = User.objects.all()
-        s = Subject.objects.all()
-        a = 0
-        for i in r:
-            a += int(i.foyiz)
-        if a != 0:
-            tmp = a // len(r)
-        else:
-            tmp = 100
-        return render(requests, 'pages/dashboard/index.html',
-                      {"qlen": len(q), "rlen": tmp, "ulen": len(u), "slen": len(s)})
+        if status == "subject":
+            sql = """SELECT cs.id cs.name, SUM(cr."result")*100/SUM(cr.totalQuestions) as "foyiz" FROM core_subject cs 
+                    INNER join core_result cr on ct.subject_id == cs.id
+                    inner join core_test ct ON cr.test_id == ct.id 
+                    GROUP by cs.id
+                """
+
+        with closing(connection.cursor()) as cursor:
+            cursor.execute(sql)
+            result = dictfetchall(cursor)
+        print(result)
+        return render(requests, "pages/dashboard/index.html", {'result': result, "a": "Test Result"})
     else:
         return redirect("locked")
 
