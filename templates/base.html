@@ -40,7 +40,7 @@
         {% endif %}
         <a href="{% url 'logout' %}">Выйти</a>
         <div class="user-date">
-            <a href="{% url 'user_profile' %}">{{ user.name }}</a>
+            <a href="{% url 'user_profile' %}">{{ user.full_name }}</a>
         </div>
     </div>
     

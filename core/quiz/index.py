@@ -10,6 +10,8 @@ from core.models import Subject, Result, Test
 
 @login_required(login_url="login")
 def index(request, pk=None):
+    if request.user.birthday is None or request.user.phone is None:
+        return redirect("required")
     sql = f"""
     SELECT s.id, s.name
     FROM core_classroomssubjects cs
@@ -54,5 +56,18 @@ def user_profile(request):
             average += result.result
             tmp += 1
 
-    ctx = {"user": current_user, "results": results, "average": average/tmp}
+    ctx = {"user": current_user, "results": results_list, "average": average/tmp if tmp != 0 else None}
     return render(request, "profile.html", ctx)
+
+def required(request):
+    if request.method == "POST":
+        try:
+            u = request.user
+            u.birthday = request.POST['birthday']
+            u.phone = request.POST['phone']
+            u.save()
+            return redirect("home")
+        except:
+            print("1")
+            return render(request, 'pages/reqPB.html', {'error': "Проверьте данные пожалуйста"})
+    return render(request, 'pages/reqPB.html')

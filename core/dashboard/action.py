@@ -98,16 +98,20 @@ def action(request, status, path, pk=None):
 @login_required(login_url="login")
 def form(req):
     if req.user.in_dashboard:
+        c = ClassRooms.objects.all()
         if req.POST:
             data = req.POST
-            User.objects.create_user(username=data["username"], name=data["first_name"],
-                                     last_name=data["last_name"], classroom_id=int(data["classroom"]),
-                                     ut=int(data["ut"]))
-            return redirect("userform")
-        c = ClassRooms.objects.all()
+            try:
+                User.objects.create_user(phone=data.get("phone"), username=None, password=data.get('password'),
+                                         birthday=data["birthday"] if data["birthday"] is not None and data["birthday"] != "" else None,
+                                         name=data["first_name"], last_name=data["last_name"],
+                                         classroom_id=int(data["classroom"]), ut=int(data["ut"]))
+            except:
+                return render(req, "pages/dashboard/form.html", {"classrooms": c, "error": "Проверьте данные"})
+            return render(req, "pages/dashboard/form.html", {"classrooms": c, "error": "Пользователь добавлен"})
+        return render(req, "pages/dashboard/form.html", {"classrooms": c})
     else:
         return redirect("locked")
-    return render(req, "pages/dashboard/form.html", {"classrooms": c})
 
 
 def userJust():

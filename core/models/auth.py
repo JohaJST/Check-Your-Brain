@@ -25,8 +25,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=256, null=True)
     classroom = models.ForeignKey(ClassRooms, on_delete=models.SET_NULL, null=True)
     just = models.BooleanField(default=False)
-    birthday = models.DateField(null=True)
-    phone = models.CharField(max_length=20, null=True)
+    birthday = models.DateField(null=True, blank=True)
+    phone = models.CharField(max_length=20, null=True, blank=True)
 
     log = models.JSONField(default={'state': 0}, null=True)
     lang = models.CharField(default='uz', max_length=2, choices=[("uz", 'uz'), ("ru", 'ru'), ("en", 'en'),], null=True)
@@ -74,6 +74,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.full_name()} || {self.username}"
+
+    def save(self, *args, **kwargs):
+        if not self.username or self.username is None:
+            self.username = self.full_name()
+        return super(User, self).save(*args, **kwargs)
 
 
 class Otp(models.Model):
