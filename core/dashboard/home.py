@@ -12,15 +12,15 @@ from core.models import Test, Result, User, Subject
 def home(requests, status="subject"):
     if requests.user.in_dashboard:
         if status == "subject":
-            sql = """SELECT cs.id cs.name, SUM(cr."result")*100/SUM(cr.totalQuestions) as "foyiz" FROM core_subject cs 
+            sql = """SELECT cs.id, cs.name, SUM(cr."result")*100/SUM(cr.totalQuestions) as "foyiz" FROM core_subject cs 
                     INNER join core_result cr on ct.subject_id == cs.id
                     inner join core_test ct ON cr.test_id == ct.id 
                     GROUP by cs.id
                 """
 
-        with closing(connection.cursor()) as cursor:
-            cursor.execute(sql)
-            result = dictfetchall(cursor)
+            with closing(connection.cursor()) as cursor:
+                cursor.execute(sql)
+                result = dictfetchall(cursor)
         print(result)
         return render(requests, "pages/dashboard/index.html", {'result': result, "a": "Test Result"})
     else:
