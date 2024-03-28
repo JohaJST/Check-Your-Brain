@@ -1,12 +1,18 @@
 {% extends 'pages/dashboard/blank.html' %}
+{% load random %}
 {% block content %}
+    {% if status != "result" %}
     <br>
     <div class="row">
         {% for i in result %}
         <div class="col-lg-3 col-6">
-            <a href="{% url 'dashboard_subject' status='classroom'  %}">
+            {% if status == 'subject' %}
+                <a href="{% url 'dashboard_classroom' status='classroom' subject_id=i.id %}">
+            {% elif status == 'classroom' %}
+                <a href="{% url 'dashboard_user' status='user' classroom_id=i.id %}">
+            {% endif %}
             <!-- small box -->
-            <div class="small-box bg-danger">
+            <div class="small-box bg-{% random_list %}">
               <div class="inner">
                 <h3>{{ i.name }}</h3>
 
@@ -16,8 +22,48 @@
                 <i class="ion ion-pie-graph"></i>
               </div>
             </div>
+            </a>
+        </div>
+
+        {% endfor %}
+    {% else %}
+        <div class="row">
+          <!-- ./col -->
+          <!-- ./col -->
+          <div class="col-lg-3 col-6">
+
+               <a href="{% url 'dlist' tip='user' %}">
+            <!-- small box -->
+            <div class="small-box bg-warning">
+              <div class="inner">
+                <h3>{{ status }}</h3>
+
+                <p>Users</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-person-add"></i>
+              </div>
+            </div>
                </a>
           </div>
-        {% endfor %}
-    </div>
+          <!-- ./col -->
+          <div class="col-lg-3 col-6">
+
+               <a href="{% url 'dlist' tip='subject' %}">
+            <!-- small box -->
+            <div class="small-box bg-danger">
+              <div class="inner">
+                <h3>{{ status }}</h3>
+
+                <p>Subjects</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-pie-graph"></i>
+              </div>
+            </div>
+               </a>
+          </div>
+          <!-- ./col -->
+        </div>
+    {% endif %}
 {% endblock %}
