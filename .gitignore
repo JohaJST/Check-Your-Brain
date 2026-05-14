@@ -164,4 +164,3 @@ core/migrations/
 Check-Your-Level.zip
 staticfiles
 db1.sqlite3
-*.zip
