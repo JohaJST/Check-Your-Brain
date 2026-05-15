@@ -98,7 +98,8 @@ class User(AbstractBaseUser):
     objects = CustomUserManager()
 
     USERNAME_FIELD = "username"
-    REQUIRED_FIELDS = ["role"]
+    # role намеренно отсутствует: create_superuser() ставит SUPERADMIN автоматически
+    REQUIRED_FIELDS = []
 
     class Meta:
         verbose_name = "Пользователь"

@@ -14,14 +14,9 @@ def sign_in(requests):
     }
     if requests.POST:
         data = requests.POST
-        # print(data)
-        # n = data["user"].split(".")
-        # print(n)
-        # user = User.objects.filter(last_name=n[0], name=n[1]).first()
-        user = User.objects.filter(username=data["user"]).first()
-        # print(user)
+        user = User.objects.filter(id=int(data["user"])).first()
         if not user:
-            ctx["error"] = "Ученик(ца) не найдено"
+            ctx["error"] = "Абитуриент(ка) не найден(а)"
             return render(requests, 'pages/auth/login.html', ctx)
 
         if not user.is_active:
