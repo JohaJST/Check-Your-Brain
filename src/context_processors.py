@@ -11,7 +11,7 @@ def interval(request):
         if request.user.interval is None:
             request.user.interval = datetime.datetime.now()
             request.user.save()
-        elif (datetime.datetime.now() - request.user.interval).total_seconds() > 1800:
+        elif (datetime.datetime.now() - request.user.interval).total_seconds() > 600:
             request.user.interval = datetime.datetime.now()
             request.user.in_dashboard = False
             request.user.save()
