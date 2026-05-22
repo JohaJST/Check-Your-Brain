@@ -20,12 +20,16 @@ def create_test(request):
         try:
             tscr = TestClassRoom.objects.create(test_id=test_name.id, classroom_id=ClassRooms.objects.get(id=request.POST.get('classroom_1')).id)
             tscr.create()
+            print(1)
             tscr = TestClassRoom.objects.create(test_id=test_name.id, classroom_id=ClassRooms.objects.get(id=request.POST.get('classroom_2')).id)
             tscr.create()
+            print(2)
             tscr = TestClassRoom.objects.create(test_id=test_name.id, classroom_id=ClassRooms.objects.get(id=request.POST.get('classroom_3')).id)
             tscr.create()
+            print(3)
             tscr = TestClassRoom.objects.create(test_id=test_name.id, classroom_id=ClassRooms.objects.get(id=request.POST.get('classroom_4')).id)
             tscr.create()
+            print(4)
         except:
             print(123)
         while f'question_{question_counter}' in request.POST:

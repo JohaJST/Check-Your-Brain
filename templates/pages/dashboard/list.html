@@ -1,3 +1,4 @@
+
 {% extends 'pages/dashboard/blank.html' %}
 {% block content %}
 <div class="card">
@@ -19,6 +20,7 @@
                     {% elif name == "User" %}
 
 {#                        <th class="sorting_asc" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-sort="ascending">Name</th>#}
+                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">ID</th>
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Last Name</th>
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Name</th>
                         <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1">Class Room</th>
@@ -89,8 +91,9 @@
                           </td>
                         </tr>
                     {% elif name == "User" %}
-                        {% if not i.is_admin %}
+{#                        {% if not i.is_admin %}#}
                         <tr role="row" class="odd">
+                            <td>{{ i.id }}</td>
                             <td>{{ i.last_name }}</td>
                             <td>{{ i.name }}</td>
                             <td>{{ i.classroom.name }}</td>
@@ -101,7 +104,7 @@
                                </a>
                             </td>
                         </tr>
-                            {% endif %}
+{#                        {% endif %}#}
                     {% elif name == "Result" %}
                        <tr role="row" class="odd">
                         <td>{{ i.id }}</td>

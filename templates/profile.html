@@ -1,5 +1,4 @@
-{% extends 'base.html' %} {% block title %}Профиль{% endblock %} {% block header
-%} {% load static %}
+{% extends 'base.html' %} {% block title %}Профиль{% endblock %} {% block header%} {% load static %}
 <link rel="stylesheet" href="{% static 'profile.css' %}" />
 {% endblock %} {% block body %}
 <div class="profile-page">
@@ -9,9 +8,12 @@
         <div class="profile-hero-info">
             <h1 class="profile-name">{{ user.full_name }}</h1>
             <p class="profile-meta">
-                {% if user.classroom %}{{ user.classroom.name }}{% endif %} {%
-                if user.birthday %}&nbsp;&middot;&nbsp;{{ user.birthday }}{%
-                endif %}
+                {% if user.classroom %}
+                    {{ user.classroom.name }}
+                {% endif %} 
+                {%if user.birthday %}
+                    {{ user.birthday }}
+                {%endif %}
             </p>
         </div>
     </div>
