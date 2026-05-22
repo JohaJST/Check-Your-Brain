@@ -1,5 +1,4 @@
-{% extends 'pages/dashboard/blank.html' %} {% block title %} User || Form {%
-endblock %} {% block content %}
+{% extends 'pages/dashboard/blank.html' %} {% block title %} User || Form {%endblock %} {% block content %}
 <div class="row">
     <!-- left column -->
     <div class="col-md-12">
@@ -9,7 +8,7 @@ endblock %} {% block content %}
                 {% csrf_token %}
                 <div class="card-body">
                     <h2 class="form-group text-center">User Forma</h2>
-                    <h4 class="form-group text-center">{{ error }}</h4>
+                    <h4 class="form-group text-center green">{{ error }}</h4>
                     <div class="form-row">
                         <div class="form-group col-md-4">
                             <div class="form-group">
