@@ -161,3 +161,4 @@ bot/migrations/
 core/migrations/
 Check-Your-Level.zip
 staticfiles
+*.sqlite3
