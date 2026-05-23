@@ -161,5 +161,4 @@ bot/migrations/
 core/migrations/
 Check-Your-Level.zip
 staticfiles
-*.sqlite3
-*.sqlite3
+db.sqlite3
