@@ -13,10 +13,11 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Путь к корневой директории проекта
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv()
+# Явно загружаем файл .env из корня проекта
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -83,25 +84,26 @@ WSGI_APPLICATION = 'src.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 
-if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-else:
-    DATABASES = {
-        'default': {
+# if DEBUG:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
+# else:
+DATABASES = {
+    'default': {
 
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.getenv('DB_NAME'),
-            'USER': os.getenv('DB_USER'),
-            'PASSWORD': os.getenv('DB_PASS'),
-            'HOST': os.getenv('DB_HOST'),
-            'PORT': int(os.getenv('DB_PORT')),
-        }
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASS'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -150,7 +152,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-RANGE = os.getenv("RANGE")
+RANGE = os.getenv("RANGE", 0)
 
-TOKEN = os.getenv("TOKEN")
+TOKEN = os.getenv("TOKEN", 0)
 
