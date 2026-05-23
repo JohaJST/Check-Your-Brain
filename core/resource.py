@@ -1,6 +1,19 @@
 from import_export import resources
-from .models import User, TG_User, ClassRooms, Subject, Result, OldResult, Question, \
-    Test, Variant, TestClassRoom, ClassRoomsSubjects
+
+from .models import (
+    ClassRooms,
+    ClassRoomsSubjects,
+    OldResult,
+    Question,
+    Result,
+    Subject,
+    Test,
+    TestClassRoom,
+    TestVarianta,
+    TG_User,
+    User,
+    Variant,
+)
 
 
 class UserResource(resources.ModelResource):
@@ -34,6 +47,11 @@ class QuestionResource(resources.ModelResource):
 class TestResource(resources.ModelResource):
     class Meta:
         model = Test
+
+
+class TestVariantaResource(resources.ModelResource):
+    class Meta:
+        model = TestVarianta
 
 
 class VariantResource(resources.ModelResource):

@@ -14,6 +14,7 @@ from core.models import (
     Subject,
     Test,
     TestClassRoom,
+    TestVarianta,
     TG_User,
     User,
     Variant,
@@ -28,6 +29,7 @@ from .resource import (
     SUbjectResource,
     TestClassRoomResource,
     TestResource,
+    TestVariantaResource,
     TG_UserResource,
     UserResource,
     VariantResource,
@@ -58,6 +60,10 @@ class TestAdmin(ImportExportModelAdmin):
     resource_class = TestResource
 
 
+class TestVariantaAdmin(ImportExportModelAdmin):
+    resource_class = TestVariantaResource
+
+
 class QuestionAdmin(ImportExportModelAdmin):
     resource_class = QuestionResource
 
@@ -84,6 +90,7 @@ admin.site.register(TestClassRoom, TestClassRoomAdmin)
 admin.site.register(ClassRooms, ClassroomAdmin)
 admin.site.register(Subject, SubjectAdmin)
 admin.site.register(Test, TestAdmin)
+admin.site.register(TestVarianta, TestVariantaAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Variant, VariantAdmin)
 admin.site.register(Result, ResultAdmin)
