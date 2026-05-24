@@ -12,7 +12,7 @@ _QUERYSETS = {
     "quiz":      lambda: Test.objects.select_related('subject').order_by('-created'),
     "variant":   lambda: Variant.objects.select_related('question').all(),
     "question":  lambda: Question.objects.select_related('varianta__test').all(),
-}
+}       
 
 _DISPLAY_NAMES = {
     "subject":   "Subject",
@@ -28,7 +28,7 @@ _DISPLAY_NAMES = {
 @login_required(login_url="login")
 def dlist(request, tip=None):
     if not request.user.in_dashboard:
-        return redirect('locked')
+        return redirect('lock')
 
     if tip == "new":
         return render(request, 'pages/dashboard/new.html', {

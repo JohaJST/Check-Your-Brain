@@ -105,6 +105,27 @@ DATABASES = {
 }
 
 
+# Cache — используй REDIS_URL в продакшене, LocMemCache для локальной разработки.
+# Для Redis: pip install django-redis  или  встроенный бэкенд Django ≥ 4.0
+_REDIS_URL = os.getenv("REDIS_URL")
+if _REDIS_URL:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": _REDIS_URL,
+            "OPTIONS": {"socket_connect_timeout": 5},
+            "KEY_PREFIX": "cyb",
+        }
+    }
+else:
+    # Безопасный дефолт для разработки (хранит в памяти процесса).
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "cyb-quiz",
+        }
+    }
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
