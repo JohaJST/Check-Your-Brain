@@ -1,153 +1,953 @@
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ru" class="h-full">
 {% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ APP_NAME }} // {{ test.name }}</title>
-    <link rel="stylesheet" href="{% static 'style.css' %}">
-    <!-- FontAweome CDN Link for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
-</head>
-<body>
-    <style>
-        a{
-        text-decoration: None;
-        }
-    </style>
-    {% if test.is_start %}
-    <!-- start Quiz button -->
-        <div class="start_btn"><button>Начать Тест</button></div>
-    
-        <!-- Info Box -->
-        <div class="info_box">
-            <div class="info-title"><span>Правила теста</span></div>
-            <div class="info-list">
-                <div class="info">1. После того как вы выберете ответ, его нельзя будет отменить.</div>
-                <div class="info">2. После оканчение теста нвжмите на кнопку выйти</div>
-                <div class="info">3. Вы получите баллы за правильные ответы</div>
-                <div class="info">4. Сколько баллов вы набрали можно будет посмотреть когда вы закончите тест</div>
+    <title>{{ test.name }} — {{ APP_NAME }}</title>
 
-            </div>
-            <div class="buttons">
-                <button class="quit"><a href="{% url 'home' %}">Выйти</a></button>
-                <button class="restart">Далее</button>
-            </div>
-        </div>
-    
-        <!-- Quiz Box -->
-        <div class="quiz_box">
-            <header>
-                <div class="title">{{ APP_NAME }}</div>
-            </header>
-            <section>
-                <div class="que_text">
-                    <!-- Here I've inserted question from JavaScript -->
-                </div>
-                <div class="option_list">
-                    <!-- Here I've inserted options from JavaScript -->
-                    {% for v in variant %}{% if v.question_id == question.first.id %}
-                        <div class="option"><span>1</span></div>
-                    {% endif %} {% endfor %}
-                </div>
-            </section>
-    
-            <!-- footer of Quiz Box -->
-            <footer>
-                <div class="total_que">
-                    <!-- Here I've inserted Question Count Number from JavaScript -->
-                </div>
-                <button class="next_btn">Cледуюший вопрос</button>
-            </footer>
-        </div>
-    
-        <!-- Result Box -->
-        <div class="result_box">
-            <div class="icon">
-                <i class="fas fa-crown"></i>
-            </div>
-            <div class="complete_text">Тест закончен</div>
-            <div class="score_text">
-                <!-- Here I've inserted Score Result from JavaScript -->
-            </div>
-            <div class="buttons">
-                <form method="post" id="results-id">
-                    {% csrf_token %}
-        {#            <button class="restart">Replay Quiz</button>#}
-                        <div class="result_for_backend"></div>
-                    <button type="submit" class="quit">Выйти</button>
-                </form>
-            </div>
-        </div>
-    {% else %}
-        <div class="wait-text"><h1>Ждём начала теста...</h1></div>
-    {% endif %}
-    <!-- Inside this JavaScript file I've coded all Quiz Codes -->
-    <script src="{% static 'script.js' %}"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        function showQuetions(index){
-    const que_text = document.querySelector(".que_text");
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+                    animation: {
+                        'fade-in': 'fadeIn .18s ease both',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%':   { opacity: '0', transform: 'translateY(6px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)'   },
+                        },
+                    },
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          crossorigin="anonymous" referrerpolicy="no-referrer">
+    <style>
+        ::-webkit-scrollbar           { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track     { background: transparent; }
+        ::-webkit-scrollbar-thumb     { background: #c7d2fe; border-radius: 9999px; }
+        * { scrollbar-width: thin; scrollbar-color: #c7d2fe transparent; }
 
-    {#//creating a new span and div tag for question and option and passing the value using array index#}
-    {#let que_tag = '<span>'+ questions[index].numb + ". " + questions[index].question +'</span>';#}
-    let que_tag = '<span>' + questions[index].question +'</span>';
-    {#let option_tag = {% for q in question %}{% for v in variant %}{% if v.question_id == q.id %}#}
-    {#    '<div class="option"><span>'+ questions[index].options[{{ forloop.counter0 }}] +'</span></div>'{% endif %}{% endfor %}{% endfor %};#}
-    que_text.innerHTML = que_tag; //adding new span tag inside que_tag
-    {#option_list.innerHTML = option_tag; //adding new div tag inside option_tag#}
+        /* Clickable option transition */
+        .opt-card { transition: border-color .12s ease, background-color .12s ease; }
+        .opt-card:hover:not(.opt-selected) {
+            border-color: #a5b4fc;
+            background-color: #eef2ff;
+        }
+        .opt-selected {
+            border-color: #4f46e5 !important;
+            background-color: #eef2ff !important;
+        }
+        .opt-badge-selected { background-color: #4f46e5 !important; color: #fff !important; }
+    </style>
+</head>
 
-    const option = option_list.querySelectorAll(".option");
-    {#option.innerHTML = "Test"#}
-    var myClasses = document.getElementsByClassName("option");
+<body class="bg-slate-50 font-sans antialiased min-h-full">
 
-    for (var i = 0; i < myClasses.length; i++) {
-      myClasses[i].innerHTML = questions[index].options[i];
-      }
-    // set onclick attribute to all available options
-    for(i=0; i < option.length; i++){
-        option[i].setAttribute("onclick", "optionSelected(this)");
+{# ═══════════════════════════════════════════════════════
+   DATA INJECTION — безопасная передача данных в JS
+════════════════════════════════════════════════════════ #}
+{% if test.is_start %}
+<script id="quiz-data" type="application/json">
+[{% for q in question %}{"id":{{ q.id }},"text":"{{ q.text|escapejs }}","img":"{% if q.img %}{{ q.img.url }}{% endif %}","answer":"{% for v in q.answers.all %}{% if v.is_answer %}{{ v.text|escapejs }}{% endif %}{% endfor %}","options":[{% for v in q.answers.all %}"{{ v.text|escapejs }}"{% if not forloop.last %},{% endif %}{% endfor %}]}{% if not forloop.last %},{% endif %}{% endfor %}]
+</script>
+{% endif %}
+
+
+{# ═══════════════════════════════════════════════════════
+   ЭКРАН ОЖИДАНИЯ (тест не запущен)
+════════════════════════════════════════════════════════ #}
+{% if not test.is_start %}
+<div class="min-h-screen flex items-center justify-center p-6">
+    <div class="text-center max-w-sm">
+        <div class="w-20 h-20 bg-amber-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
+            <i class="fa-regular fa-clock text-amber-500 text-3xl"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-800 mb-2">Ожидайте начала</h2>
+        <p class="text-slate-500 text-sm mb-8">
+            Тест ещё не открыт. Как только преподаватель запустит его — страница автоматически обновится.
+        </p>
+        <a href="{% url 'home' %}"
+           class="inline-flex items-center gap-2 text-sm font-medium text-indigo-600
+                  hover:text-indigo-500 transition-colors">
+            <i class="fa-solid fa-arrow-left text-xs"></i>
+            На главную
+        </a>
+    </div>
+</div>
+
+{% else %}
+{# ═══════════════════════════════════════════════════════
+   ЭКРАН ВСТУПЛЕНИЯ  (Screen 1)
+════════════════════════════════════════════════════════ #}
+<div id="intro-screen" class="{% if test_completed %}hidden {% endif %}min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-lg border border-slate-100
+                max-w-md w-full p-8 animate-fade-in">
+
+        <!-- Иконка -->
+        <div class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center
+                    justify-center mx-auto mb-6">
+            <i class="fa-solid fa-clipboard-question text-indigo-600 text-2xl"></i>
+        </div>
+
+        <!-- Заголовок -->
+        <h1 class="text-2xl font-bold text-slate-800 text-center mb-1">
+            {{ test.name }}
+        </h1>
+        {% if test.desc %}
+        <p class="text-slate-500 text-sm text-center mb-6">{{ test.desc }}</p>
+        {% else %}
+        <div class="mb-6"></div>
+        {% endif %}
+
+        <!-- Число вопросов -->
+        <div class="flex justify-center mb-7">
+            <div class="bg-indigo-50 rounded-2xl px-8 py-4 text-center">
+                <p class="text-3xl font-bold text-indigo-600" id="intro-q-count">—</p>
+                <p class="text-xs text-slate-500 mt-0.5">вопросов</p>
+            </div>
+        </div>
+
+        <!-- Правила -->
+        <div class="bg-slate-50 rounded-2xl p-5 space-y-3 mb-7">
+            <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                Правила
+            </p>
+            <div class="flex items-start gap-3">
+                <span class="w-5 h-5 bg-indigo-100 rounded-full flex items-center
+                             justify-center shrink-0 mt-0.5">
+                    <i class="fa-solid fa-check text-indigo-600 text-[9px]"></i>
+                </span>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    Выбранный ответ можно изменить до отправки теста.
+                </p>
+            </div>
+            <div class="flex items-start gap-3">
+                <span class="w-5 h-5 bg-indigo-100 rounded-full flex items-center
+                             justify-center shrink-0 mt-0.5">
+                    <i class="fa-solid fa-check text-indigo-600 text-[9px]"></i>
+                </span>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    Навигация свободная: используйте кнопки или панель номеров.
+                </p>
+            </div>
+            <div class="flex items-start gap-3">
+                <span class="w-5 h-5 bg-indigo-100 rounded-full flex items-center
+                             justify-center shrink-0 mt-0.5">
+                    <i class="fa-solid fa-check text-indigo-600 text-[9px]"></i>
+                </span>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    После нажатия «Завершить» изменить ответы невозможно.
+                </p>
+            </div>
+        </div>
+
+        <!-- Уведомление о восстановлении прогресса (показывается JS) -->
+        <div id="restore-notice" class="hidden text-center mb-4">
+            <span class="inline-flex items-center gap-1.5 text-xs font-medium text-amber-600
+                         bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200">
+                <i class="fa-solid fa-rotate-right"></i>
+                Восстановлен прогресс
+            </span>
+        </div>
+
+        <!-- Кнопка старта -->
+        <button id="start-btn" onclick="startExam()"
+                class="w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700
+                       text-white font-semibold py-3.5 rounded-2xl transition-all
+                       duration-150 active:scale-[.98]">
+            Начать тест
+            <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>
+        </button>
+
+        <div class="text-center mt-4">
+            <a href="{% url 'home' %}"
+               class="text-sm text-slate-400 hover:text-slate-600 transition-colors">
+                Вернуться на главную
+            </a>
+        </div>
+    </div>
+</div>
+
+
+{# ═══════════════════════════════════════════════════════
+   ОСНОВНОЙ ЭКРАН ТЕСТА  (Screen 2)
+════════════════════════════════════════════════════════ #}
+<div id="exam-screen" class="hidden min-h-screen flex-col">
+
+    <!-- ── Шапка ─────────────────────────────────────────────── -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-20">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center gap-4">
+
+            <!-- Название теста -->
+            <p class="flex-1 min-w-0 text-sm font-semibold text-slate-700 truncate">
+                {{ test.name }}
+            </p>
+
+            <!-- Прогресс-бар (только на sm+) -->
+            <div class="hidden sm:flex items-center gap-2.5">
+                <div class="h-1.5 w-28 bg-slate-100 rounded-full overflow-hidden">
+                    <div id="hdr-progress"
+                         class="h-full bg-indigo-500 rounded-full transition-all duration-400"
+                         style="width:0%"></div>
+                </div>
+                <span id="hdr-progress-text"
+                      class="text-xs font-medium text-slate-500 tabular-nums w-12">
+                    0 / 0
+                </span>
+            </div>
+
+            <!-- Таймер -->
+            <div class="flex items-center gap-1.5">
+                <i class="fa-regular fa-clock text-slate-400 text-sm"></i>
+                <span id="timer"
+                      class="text-sm font-mono font-medium text-slate-600 tabular-nums">
+                    00:00
+                </span>
+            </div>
+
+            <!-- Выход -->
+            <a href="{% url 'home' %}"
+               onclick="return confirm('Прогресс будет потерян. Выйти?')"
+               class="text-xs text-slate-400 hover:text-rose-500 hover:bg-rose-50
+                      px-2.5 py-1.5 rounded-lg transition-all">
+                Выйти
+            </a>
+        </div>
+    </header>
+
+    <!-- ── Тело ───────────────────────────────────────────────── -->
+    <div class="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-6 flex gap-6 items-start">
+
+        <!-- Левая панель (только md+) -->
+        <aside class="hidden md:block w-52 shrink-0 sticky top-20">
+            <div class="bg-white rounded-2xl border border-slate-200 p-4">
+                <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-3">
+                    Вопросы
+                </p>
+                <!-- Сетка кнопок — заполняется JS -->
+                <div id="nav-grid"
+                     class="grid grid-cols-5 gap-1.5 mb-4"></div>
+
+                <!-- Легенда -->
+                <div class="space-y-2 pt-3 border-t border-slate-100">
+                    <div class="flex items-center gap-2">
+                        <span class="w-4 h-4 rounded bg-indigo-600 shrink-0"></span>
+                        <span class="text-[11px] text-slate-500">Текущий</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-4 h-4 rounded bg-indigo-100 border
+                                     border-indigo-300 shrink-0"></span>
+                        <span class="text-[11px] text-slate-500">Отвечен</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-4 h-4 rounded border border-slate-200
+                                     bg-white shrink-0"></span>
+                        <span class="text-[11px] text-slate-500">Пропущен</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Итог по ответам -->
+            <div class="mt-3 bg-white rounded-2xl border border-slate-200 p-4">
+                <div class="flex justify-between text-xs mb-1.5">
+                    <span class="text-slate-500">Отвечено</span>
+                    <span id="aside-answered"
+                          class="font-semibold text-slate-700 tabular-nums">0 / 0</span>
+                </div>
+                <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div id="aside-bar"
+                         class="h-full bg-indigo-500 rounded-full transition-all duration-400"
+                         style="width:0%"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Правая часть: вопрос + навигация -->
+        <main class="flex-1 min-w-0">
+
+            <!-- Мобильная навигация (горизонтальный скролл, только < md) -->
+            <div class="md:hidden bg-white rounded-2xl border border-slate-200 p-3 mb-4">
+                <div id="nav-mobile"
+                     class="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-none"></div>
+            </div>
+
+            <!-- Карточка вопроса -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+
+                <!-- Заголовок карточки -->
+                <div class="flex items-center justify-between
+                            px-5 sm:px-6 py-4 border-b border-slate-100">
+                    <span class="text-xs font-semibold text-indigo-600
+                                 bg-indigo-50 px-3 py-1 rounded-full">
+                        Вопрос&nbsp;<span id="q-num">1</span>
+                        &nbsp;из&nbsp;<span id="q-total">0</span>
+                    </span>
+                    <span id="q-answered-badge"
+                          class="hidden items-center gap-1.5 text-xs text-emerald-600
+                                 bg-emerald-50 px-2.5 py-1 rounded-full font-medium">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Отвечен
+                    </span>
+                </div>
+
+                <!-- Текст вопроса + изображение -->
+                <div class="px-5 sm:px-6 pt-6 pb-2">
+                    <p id="q-text"
+                       class="text-base sm:text-lg font-medium text-slate-800
+                              leading-relaxed animate-fade-in"></p>
+                    <div id="q-img-wrap" class="hidden mt-4">
+                        <img id="q-img" src="" alt=""
+                             class="rounded-xl max-h-64 object-contain
+                                    border border-slate-100 shadow-sm">
+                    </div>
+                </div>
+
+                <!-- Варианты ответов — заполняются JS -->
+                <div id="options" class="px-5 sm:px-6 pb-6 pt-4 space-y-2.5"></div>
+            </div>
+
+            <!-- Кнопки навигации -->
+            <div class="flex items-center justify-between gap-3 mt-4">
+
+                <!-- Назад -->
+                <button id="btn-prev" onclick="navigate(-1)"
+                        disabled
+                        class="flex items-center gap-2 px-5 py-2.5 rounded-xl
+                               border border-slate-200 text-slate-600 font-medium
+                               text-sm hover:bg-slate-50 hover:border-slate-300
+                               transition-all disabled:opacity-35 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-arrow-left text-xs"></i>
+                    Назад
+                </button>
+
+                <!-- Мобильный прогресс (центр) -->
+                <div class="flex-1 sm:hidden">
+                    <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div id="mob-progress"
+                             class="h-full bg-indigo-500 rounded-full transition-all duration-400"
+                             style="width:0%"></div>
+                    </div>
+                </div>
+
+                <!-- Вперёд + Завершить -->
+                <div class="flex items-center gap-2">
+                    <!-- Завершить (скрыта пока не последний или не все отвечены) -->
+                    <button id="btn-submit" onclick="confirmSubmit()"
+                            class="hidden items-center gap-2 px-5 py-2.5 rounded-xl
+                                   bg-emerald-600 hover:bg-emerald-500 text-white
+                                   font-medium text-sm transition-all active:scale-[.97]">
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                        Завершить тест
+                    </button>
+
+                    <!-- Вперёд -->
+                    <button id="btn-next" onclick="navigate(1)"
+                            class="flex items-center gap-2 px-5 py-2.5 rounded-xl
+                                   bg-indigo-600 hover:bg-indigo-500 text-white
+                                   font-medium text-sm transition-all active:scale-[.97]
+                                   disabled:opacity-35 disabled:cursor-not-allowed">
+                        Вперёд
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+        </main>
+    </div><!-- / тело -->
+</div><!-- / exam-screen -->
+
+
+{# ═══════════════════════════════════════════════════════
+   МОДАЛ ПОДТВЕРЖДЕНИЯ ОТПРАВКИ  (Screen 3)
+════════════════════════════════════════════════════════ #}
+<div id="modal-overlay"
+     class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50
+            items-center justify-center p-4"
+     onclick="closeModal(event)">
+
+    <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 text-center
+                animate-fade-in" onclick="event.stopPropagation()">
+
+        <div class="w-14 h-14 bg-amber-100 rounded-2xl flex items-center
+                    justify-center mx-auto mb-5">
+            <i class="fa-solid fa-triangle-exclamation text-amber-500 text-xl"></i>
+        </div>
+
+        <h3 class="text-xl font-bold text-slate-800 mb-2">Завершить тест?</h3>
+        <p id="modal-body" class="text-slate-500 text-sm leading-relaxed mb-7"></p>
+
+        <div class="flex gap-3">
+            <button onclick="hideModal()"
+                    class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600
+                           font-medium text-sm hover:bg-slate-50 transition-all">
+                Продолжить
+            </button>
+            <button onclick="showResults()"
+                    class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500
+                           text-white font-semibold text-sm transition-all active:scale-[.97]">
+                Отправить
+            </button>
+        </div>
+    </div>
+</div>
+
+
+{# ═══════════════════════════════════════════════════════
+   ЭКРАН РЕЗУЛЬТАТОВ  (Screen 4)
+════════════════════════════════════════════════════════ #}
+<div id="results-screen" class="hidden min-h-screen bg-slate-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-lg border border-slate-100 max-w-md w-full p-8 text-center animate-fade-in">
+
+        <!-- Score ring SVG (r=52, circumference≈326.7) -->
+        <div class="relative inline-flex items-center justify-center mb-6">
+            <svg viewBox="0 0 120 120" class="w-32 h-32">
+                <circle cx="60" cy="60" r="52" fill="none" stroke="#e2e8f0" stroke-width="10"/>
+                <circle id="score-ring" cx="60" cy="60" r="52" fill="none"
+                        stroke="#4f46e5" stroke-width="10" stroke-linecap="round"
+                        stroke-dasharray="326.7" stroke-dashoffset="326.7"
+                        transform="rotate(-90 60 60)"
+                        style="transition: stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)"/>
+            </svg>
+            <div class="absolute text-center">
+                <p id="res-pct" class="text-2xl font-bold text-slate-800">0%</p>
+            </div>
+        </div>
+
+        <!-- Message -->
+        <h2 id="res-message" class="text-xl font-bold text-slate-800 mb-1">Тест завершён</h2>
+        <p class="text-slate-500 text-sm mb-6">{{ test.name }}</p>
+
+        <!-- Stats row: 3 boxes -->
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <div class="bg-slate-50 rounded-xl p-3">
+                <p id="res-correct" class="text-xl font-bold text-emerald-600">0</p>
+                <p class="text-xs text-slate-500 mt-0.5">Верных</p>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-3">
+                <p id="res-wrong" class="text-xl font-bold text-rose-500">0</p>
+                <p class="text-xs text-slate-500 mt-0.5">Неверных</p>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-3">
+                <p id="res-time" class="text-xl font-bold text-slate-700 font-mono">00:00</p>
+                <p class="text-xs text-slate-500 mt-0.5">Время</p>
+            </div>
+        </div>
+
+        <!-- Breakdown (wrong answers only, collapsible) -->
+        <div id="breakdown-section" class="text-left mb-6 hidden">
+            <button onclick="toggleBreakdown()"
+                    class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl
+                           bg-slate-50 hover:bg-slate-100 transition-colors text-sm
+                           font-medium text-slate-600 mb-2">
+                <span>Разбор ошибок</span>
+                <i id="breakdown-icon" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+            </button>
+            <div id="breakdown-list" class="space-y-1.5 hidden max-h-48 overflow-y-auto"></div>
+        </div>
+
+        <!-- Submit button -->
+        <button onclick="finishAndSubmit()"
+                class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold
+                       py-3.5 rounded-2xl transition-all active:scale-[.98]">
+            <i class="fa-solid fa-check mr-2"></i>Завершить и выйти
+        </button>
+    </div>
+</div>
+
+
+{# ═══════════════════════════════════════════════════════
+   ЭКРАН «УЖЕ ПРОЙДЕН»  (Screen 5)
+════════════════════════════════════════════════════════ #}
+<div id="completed-screen" class="{% if test_completed %}{% else %}hidden {% endif %}min-h-screen bg-slate-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-lg border border-slate-100 max-w-sm w-full p-8 text-center">
+        <div class="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
+            <i class="fa-solid fa-trophy text-emerald-600 text-2xl"></i>
+        </div>
+        <h2 class="text-xl font-bold text-slate-800 mb-2">Тест уже пройден</h2>
+        <p class="text-slate-500 text-sm mb-7">Вы уже сдавали этот тест. Повторное прохождение недоступно.</p>
+        <a href="{% url 'user_profile' %}"
+           class="w-full inline-block text-center bg-indigo-600 hover:bg-indigo-500
+                  text-white font-semibold py-3 rounded-2xl transition-all mb-3">
+            Посмотреть результаты
+        </a>
+        <a href="{% url 'home' %}"
+           class="block text-sm text-slate-400 hover:text-slate-600 transition-colors">
+            На главную
+        </a>
+    </div>
+</div>
+
+
+{# Скрытая форма для отправки на бэкенд #}
+<form id="submit-form" method="post"
+      action="{% url 'test' test_id=test.id %}" class="hidden">
+    {% csrf_token %}
+    <input type="hidden" name="result" id="result-input" value="0">
+</form>
+
+{% endif %}{# end test.is_start #}
+
+
+{# ═══════════════════════════════════════════════════════
+   JAVASCRIPT
+════════════════════════════════════════════════════════ #}
+{% if test.is_start %}
+<script>
+/* ─────────────────────────────────────────────────────────
+   1. ДАННЫЕ (из Django)
+───────────────────────────────────────────────────────── */
+const QUESTIONS = JSON.parse(
+    document.getElementById('quiz-data').textContent
+);
+
+/* ─────────────────────────────────────────────────────────
+   2. СОСТОЯНИЕ
+───────────────────────────────────────────────────────── */
+let currentIdx = 0;
+// userAnswers[i] = null (не отвечен) | строка (текст выбранного варианта)
+const userAnswers = new Array(QUESTIONS.length).fill(null);
+let _startedAt = 0;
+
+/* ─────────────────────────────────────────────────────────
+   3. LOCALSTORAGE
+───────────────────────────────────────────────────────── */
+const TEST_ID   = {{ test.id }};
+const STATE_KEY = `cyb_quiz_${TEST_ID}`;
+
+function _loadState() {
+    try { return JSON.parse(localStorage.getItem(STATE_KEY)); } catch(e) { return null; }
+}
+
+function _saveState(extra = {}) {
+    localStorage.setItem(STATE_KEY, JSON.stringify({
+        status: 'in_progress',
+        currentIdx,
+        userAnswers: [...userAnswers],
+        startedAt: _startedAt,
+        elapsedSecs: _timerSecs,
+        ...extra
+    }));
+}
+
+function _clearState() {
+    localStorage.removeItem(STATE_KEY);
+}
+
+/* ─────────────────────────────────────────────────────────
+   4. ИНИТ
+───────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+    // Показываем число вопросов на экране вступления
+    const el = document.getElementById('intro-q-count');
+    if (el) el.textContent = QUESTIONS.length;
+
+    // Проверяем наличие сохранённого прогресса
+    const saved = _loadState();
+    if (saved?.status === 'in_progress') {
+        const btn = document.getElementById('start-btn');
+        if (btn) btn.innerHTML = 'Продолжить <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>';
+        const notice = document.getElementById('restore-notice');
+        if (notice) notice.classList.remove('hidden');
     }
-    const allOptions = option_list.children.length; //getting all option items
+});
 
-    for(i=0; i < allOptions; i++){
-        option_list.children[i].classList.remove("disabled"); //once user select an option then disabled all options
+/* ─────────────────────────────────────────────────────────
+   5. ЗАПУСК ТЕСТА
+───────────────────────────────────────────────────────── */
+function startExam() {
+    const saved = _loadState();
+
+    if (saved?.status === 'completed') {
+        // Уже завершён — показываем экран «уже пройден»
+        document.getElementById('intro-screen').classList.add('hidden');
+        const cs = document.getElementById('completed-screen');
+        cs.classList.remove('hidden');
+        cs.classList.add('flex');
+        return;
+    }
+
+    if (saved?.status === 'in_progress') {
+        // Восстанавливаем прогресс
+        saved.userAnswers.forEach((a, i) => { userAnswers[i] = a; });
+        currentIdx  = saved.currentIdx || 0;
+        _timerSecs  = saved.elapsedSecs || 0;
+        _startedAt  = saved.startedAt  || Date.now();
+    } else {
+        _startedAt = Date.now();
+        _saveState();
+    }
+
+    document.getElementById('intro-screen').classList.add('hidden');
+    const screen = document.getElementById('exam-screen');
+    screen.classList.remove('hidden');
+    screen.classList.add('flex', 'flex-col');
+
+    _buildNavGrids();
+    _render(currentIdx);
+    _startTimer();
+}
+
+/* ─────────────────────────────────────────────────────────
+   6. ПАНЕЛИ НАВИГАЦИИ
+───────────────────────────────────────────────────────── */
+function _buildNavGrids() {
+    const grid   = document.getElementById('nav-grid');
+    const mobile = document.getElementById('nav-mobile');
+    const total  = document.getElementById('q-total');
+
+    if (total) total.textContent = QUESTIONS.length;
+
+    [grid, mobile].forEach(container => {
+        if (!container) return;
+        container.innerHTML = '';
+        QUESTIONS.forEach((_, i) => container.appendChild(_makeNavBtn(i)));
+    });
+}
+
+function _makeNavBtn(i) {
+    const btn = document.createElement('button');
+    btn.dataset.navIdx = i;
+    btn.textContent    = i + 1;
+    btn.onclick        = () => goTo(i);
+    _styleNavBtn(btn, i);
+    return btn;
+}
+
+function _styleNavBtn(btn, i) {
+    const base = 'w-8 h-8 text-xs font-semibold rounded-lg transition-all shrink-0 ' +
+                 'focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-1';
+    if (i === currentIdx) {
+        btn.className = base + ' bg-indigo-600 text-white shadow-md shadow-indigo-200';
+    } else if (userAnswers[i] !== null) {
+        btn.className = base + ' bg-indigo-100 text-indigo-700 border border-indigo-300';
+    } else {
+        btn.className = base + ' bg-white text-slate-500 border border-slate-200 ' +
+                        'hover:border-indigo-300 hover:text-indigo-600';
     }
 }
-    </script>
-    <script> 
-    let questions = [
-        {% for q in question %}
-            {
-            numb: {{ q.id }},
-            question: "{{ q.text }}",
-            {% for a in variant %}
-                {% if a.question_id == q.id and a.is_answer %}
-                    answer: "{{ a.text }}",
-                {% endif %}
-            {% endfor %}
-            options: [
-                {% for v in variant %}
-                    {% if v.question_id == q.id %}
-                        "{{ v.text }}",
-                    {% endif %}
-                {% endfor %}
-            ]
-          },
-        {% endfor %}
-  // you can uncomment the below codes and make duplicate as more as you want to add question
-  // but remember you need to give the numb value serialize like 1,2,3,5,6,7,8,9.....
 
-  //   {
-  //   numb: 6,
-  //   question: "Your Question is Here",
-  //   answer: "Correct answer of the question is here",
-  //   options: [
-  //     "Option 1",
-  //     "option 2",
-  //     "option 3",
-  //     "option 4"
-  //   ]
-  // },
-];
-    </script>
+function _refreshNav() {
+    // Обновляем все кнопки в обеих панелях
+    document.querySelectorAll('[data-nav-idx]').forEach(btn => {
+        _styleNavBtn(btn, parseInt(btn.dataset.navIdx));
+    });
+}
+
+/* ─────────────────────────────────────────────────────────
+   7. РЕНДЕР ВОПРОСА
+───────────────────────────────────────────────────────── */
+function _render(idx) {
+    const q = QUESTIONS[idx];
+
+    // Счётчик
+    document.getElementById('q-num').textContent = idx + 1;
+
+    // Бейдж «Отвечен»
+    const badge = document.getElementById('q-answered-badge');
+    if (userAnswers[idx] !== null) {
+        badge.classList.remove('hidden');
+        badge.classList.add('flex');
+    } else {
+        badge.classList.add('hidden');
+        badge.classList.remove('flex');
+    }
+
+    // Текст вопроса (анимация при смене)
+    const qText = document.getElementById('q-text');
+    qText.classList.remove('animate-fade-in');
+    void qText.offsetWidth; // reflow
+    qText.classList.add('animate-fade-in');
+    qText.textContent = q.text;
+
+    // Изображение
+    const imgWrap = document.getElementById('q-img-wrap');
+    const imgEl   = document.getElementById('q-img');
+    if (q.img) {
+        imgEl.src = q.img;
+        imgWrap.classList.remove('hidden');
+    } else {
+        imgWrap.classList.add('hidden');
+    }
+
+    // Варианты ответов
+    const container = document.getElementById('options');
+    container.innerHTML = '';
+    q.options.forEach((opt, optIdx) => {
+        container.appendChild(_makeOption(opt, optIdx, idx));
+    });
+
+    // Кнопка «Назад»
+    document.getElementById('btn-prev').disabled = (idx === 0);
+
+    // Кнопки «Вперёд» / «Завершить»
+    const isLast      = idx === QUESTIONS.length - 1;
+    const allAnswered = userAnswers.every(a => a !== null);
+    const btnNext   = document.getElementById('btn-next');
+    const btnSubmit = document.getElementById('btn-submit');
+
+    if (isLast) {
+        btnNext.classList.add('hidden');
+        btnSubmit.classList.remove('hidden');
+        btnSubmit.classList.add('flex');
+    } else {
+        btnNext.classList.remove('hidden');
+        btnNext.disabled = false;
+        if (allAnswered) {
+            btnSubmit.classList.remove('hidden');
+            btnSubmit.classList.add('flex');
+        } else {
+            btnSubmit.classList.add('hidden');
+            btnSubmit.classList.remove('flex');
+        }
+    }
+
+    _refreshNav();
+    _updateProgress();
+
+    // Скролл наверх на мобайле
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ─────────────────────────────────────────────────────────
+   8. КАРТОЧКА ВАРИАНТА ОТВЕТА
+───────────────────────────────────────────────────────── */
+function _makeOption(text, optIdx, qIdx) {
+    const selected = (userAnswers[qIdx] === text);
+    const letter   = String.fromCharCode(65 + optIdx); // A, B, C…
+
+    // Обёртка-label
+    const label = document.createElement('label');
+    label.className = [
+        'opt-card flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer select-none',
+        selected ? 'opt-selected border-indigo-500' : 'border-slate-100 bg-white',
+    ].join(' ');
+    label.htmlFor = `opt-${qIdx}-${optIdx}`;
+
+    // Скрытый radio
+    const radio = document.createElement('input');
+    radio.type    = 'radio';
+    radio.name    = `q-${qIdx}`;
+    radio.id      = `opt-${qIdx}-${optIdx}`;
+    radio.value   = text;
+    radio.checked = selected;
+    radio.className = 'sr-only';
+    radio.addEventListener('change', () => {
+        userAnswers[qIdx] = text;
+        _render(currentIdx);
+        _saveState();
+    });
+
+    // Буква-бейдж
+    const badge = document.createElement('span');
+    badge.className = [
+        'opt-badge w-8 h-8 rounded-lg flex items-center justify-center',
+        'text-xs font-bold shrink-0 transition-all',
+        selected ? 'opt-badge-selected' : 'bg-slate-100 text-slate-500',
+    ].join(' ');
+    badge.textContent = letter;
+
+    // Текст варианта
+    const span = document.createElement('span');
+    span.className  = 'flex-1 text-sm font-medium ' +
+                      (selected ? 'text-indigo-800' : 'text-slate-700');
+    span.textContent = text;
+
+    // Галочка (только при выборе)
+    const check = document.createElement('i');
+    check.className = 'fa-solid fa-circle-check text-lg shrink-0 ' +
+                      (selected ? 'text-indigo-500' : 'text-transparent');
+
+    label.append(radio, badge, span, check);
+    return label;
+}
+
+/* ─────────────────────────────────────────────────────────
+   9. НАВИГАЦИЯ
+───────────────────────────────────────────────────────── */
+function goTo(idx) {
+    if (idx < 0 || idx >= QUESTIONS.length) return;
+    currentIdx = idx;
+    _render(currentIdx);
+}
+
+function navigate(delta) {
+    goTo(currentIdx + delta);
+    _saveState();
+}
+
+// Клавиатурная навигация (← →)
+document.addEventListener('keydown', e => {
+    if (!document.getElementById('exam-screen').classList.contains('hidden')) {
+        if (e.key === 'ArrowRight') navigate(1);
+        if (e.key === 'ArrowLeft')  navigate(-1);
+    }
+});
+
+/* ─────────────────────────────────────────────────────────
+   10. ПРОГРЕСС
+───────────────────────────────────────────────────────── */
+function _updateProgress() {
+    const answered = userAnswers.filter(a => a !== null).length;
+    const total    = QUESTIONS.length;
+    const pct      = total > 0 ? (answered / total) * 100 : 0;
+
+    const ids = ['hdr-progress', 'mob-progress', 'aside-bar'];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.width = pct + '%';
+    });
+
+    const txt = answered + ' / ' + total;
+    ['hdr-progress-text', 'aside-answered'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = txt;
+    });
+}
+
+/* ─────────────────────────────────────────────────────────
+   11. ТАЙМЕР
+───────────────────────────────────────────────────────── */
+let _timerSecs = 0;
+let _timerRef  = null;
+
+function _startTimer() {
+    _timerRef = setInterval(() => {
+        _timerSecs++;
+        const m  = String(Math.floor(_timerSecs / 60)).padStart(2, '0');
+        const s  = String(_timerSecs % 60).padStart(2, '0');
+        const el = document.getElementById('timer');
+        if (el) el.textContent = m + ':' + s;
+    }, 1000);
+}
+
+/* ─────────────────────────────────────────────────────────
+   12. ПОДТВЕРЖДЕНИЕ ЗАВЕРШЕНИЯ
+───────────────────────────────────────────────────────── */
+function confirmSubmit() {
+    const unanswered = userAnswers.filter(a => a === null).length;
+    const answered   = QUESTIONS.length - unanswered;
+    const body       = document.getElementById('modal-body');
+
+    if (unanswered > 0) {
+        body.innerHTML =
+            'Вы ответили на <strong class="text-slate-800 font-semibold">' +
+            answered + ' из ' + QUESTIONS.length + '</strong> вопросов. ' +
+            'Пропущенные будут засчитаны как неверные.';
+    } else {
+        body.innerHTML =
+            'Вы ответили на все <strong class="text-slate-800 font-semibold">' +
+            QUESTIONS.length + '</strong> вопросов. Готовы отправить?';
+    }
+
+    const overlay = document.getElementById('modal-overlay');
+    overlay.classList.remove('hidden');
+    overlay.classList.add('flex');
+}
+
+function hideModal() {
+    const overlay = document.getElementById('modal-overlay');
+    overlay.classList.add('hidden');
+    overlay.classList.remove('flex');
+}
+
+function closeModal(event) {
+    if (event.target === document.getElementById('modal-overlay')) hideModal();
+}
+
+/* ─────────────────────────────────────────────────────────
+   13. ПОКАЗ РЕЗУЛЬТАТОВ
+───────────────────────────────────────────────────────── */
+let _correctCount  = 0;
+let _resultDetails = [];
+
+function showResults() {
+    hideModal();
+
+    _resultDetails = QUESTIONS.map((q, i) => ({
+        text:          q.text,
+        userAnswer:    userAnswers[i],
+        correctAnswer: q.answer,
+        isCorrect:     userAnswers[i] !== null && userAnswers[i] === q.answer
+    }));
+    _correctCount = _resultDetails.filter(d => d.isCorrect).length;
+    const total = QUESTIONS.length;
+    const pct   = total > 0 ? Math.round(_correctCount / total * 100) : 0;
+
+    // Останавливаем таймер
+    if (_timerRef) clearInterval(_timerRef);
+
+    // Сохраняем результат в localStorage
+    _saveState({ status: 'completed', score: _correctCount, total });
+
+    // Скрываем экран теста, показываем результаты
+    document.getElementById('exam-screen').classList.add('hidden');
+    document.getElementById('exam-screen').classList.remove('flex', 'flex-col');
+    const rs = document.getElementById('results-screen');
+    rs.classList.remove('hidden');
+    rs.classList.add('flex');
+
+    // Анимируем кольцо результата
+    const ring  = document.getElementById('score-ring');
+    const circ  = 2 * Math.PI * 52; // ≈326.7
+    const color = pct >= 90 ? '#10b981' : pct >= 70 ? '#4f46e5' : pct >= 50 ? '#f59e0b' : '#ef4444';
+    ring.style.stroke = color;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        ring.style.strokeDashoffset = circ * (1 - pct / 100);
+    }));
+
+    // Текстовые показатели
+    document.getElementById('res-pct').textContent     = pct + '%';
+    document.getElementById('res-pct').style.color     = color;
+    document.getElementById('res-correct').textContent = _correctCount;
+    document.getElementById('res-wrong').textContent   = total - _correctCount;
+    const m = String(Math.floor(_timerSecs / 60)).padStart(2, '0');
+    const s = String(_timerSecs % 60).padStart(2, '0');
+    document.getElementById('res-time').textContent = m + ':' + s;
+
+    const messages = { 90: 'Отлично! 🎉', 70: 'Хороший результат!', 50: 'Можно лучше', 0: 'Требует повторения' };
+    document.getElementById('res-message').textContent =
+        Object.entries(messages).reverse().find(([t]) => pct >= +t)[1];
+
+    // Разбор ошибок
+    const wrongs = _resultDetails.filter(d => !d.isCorrect);
+    if (wrongs.length > 0) {
+        const section = document.getElementById('breakdown-section');
+        const list    = document.getElementById('breakdown-list');
+        section.classList.remove('hidden');
+        list.innerHTML = wrongs.map(d => `
+            <div class="flex items-start gap-3 px-3 py-2.5 rounded-xl bg-rose-50">
+                <i class="fa-solid fa-circle-xmark text-rose-500 shrink-0 mt-0.5"></i>
+                <div class="min-w-0">
+                    <p class="text-xs text-slate-600 line-clamp-1">${d.text}</p>
+                    <p class="text-xs text-emerald-700 mt-0.5">&#10003; ${d.correctAnswer || 'не задан'}</p>
+                </div>
+            </div>`).join('');
+    }
+}
+
+function toggleBreakdown() {
+    const list = document.getElementById('breakdown-list');
+    const icon = document.getElementById('breakdown-icon');
+    list.classList.toggle('hidden');
+    icon.classList.toggle('rotate-180');
+}
+
+function finishAndSubmit() {
+    _clearState();
+    document.getElementById('result-input').value = _correctCount;
+    document.getElementById('submit-form').submit();
+}
+</script>
+{% endif %}
+
 </body>
 </html>

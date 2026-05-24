@@ -68,9 +68,12 @@ def test(request, test_id):
     except Test.DoesNotExist:
         return redirect("home")
 
+    test_completed = Result.objects.filter(user=request.user, test_id=test_id).exists()
+
     ctx = {
         "question": questions,
         "variant": variants,
         "test": test_obj,
+        "test_completed": test_completed,
     }
     return render(request, 'test.html', ctx)

@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import Avg
+from django.db.models import Avg, Count
 from django.shortcuts import redirect, render
 
 from core.models import Result, Test
@@ -26,11 +26,18 @@ def index(request, pk=None):
             is_start=True,
         )
         .select_related('subject')
+        .annotate(question_count=Count('variantas__questions', distinct=True))
         .distinct()
         .order_by('-created')
     )
 
-    return render(request, 'index.html', {'tests': tests})
+    completed_test_ids = set(
+        Result.objects
+        .filter(user=request.user)
+        .values_list('test_id', flat=True)
+    )
+
+    return render(request, 'index.html', {'tests': tests, 'completed_test_ids': completed_test_ids})
 
 
 @login_required(login_url="login")
