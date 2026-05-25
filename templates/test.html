@@ -1,970 +1,193 @@
-<!DOCTYPE html>
-<html lang="ru" class="h-full">
+<html lang="en">
 {% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ test.name }} — {{ APP_NAME }}</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
-                    animation:  { 'fade-in': 'fadeIn .18s ease both' },
-                    keyframes:  {
-                        fadeIn: {
-                            '0%':   { opacity: '0', transform: 'translateY(6px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)'   },
-                        },
-                    },
-                }
-            }
-        }
-    </script>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-          rel="stylesheet">
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-          crossorigin="anonymous" referrerpolicy="no-referrer">
-
+    <title>{{ APP_NAME }} // {{ test.name }}</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
     <style>
-        ::-webkit-scrollbar            { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track      { background: transparent; }
-        ::-webkit-scrollbar-thumb      { background: #c7d2fe; border-radius: 9999px; }
-        *                              { scrollbar-width: thin; scrollbar-color: #c7d2fe transparent; }
-        .opt-card                      { transition: border-color .12s ease, background-color .12s ease; }
-        .opt-card:hover:not(.opt-sel)  { border-color: #a5b4fc; background: #eef2ff; }
-        .opt-sel                       { border-color: #4f46e5 !important; background: #eef2ff !important; }
-        .opt-badge-sel                 { background: #4f46e5 !important; color: #fff !important; }
-        @keyframes spin-pulse          { 0%,100% { opacity:1 } 50% { opacity:.4 } }
-        .as-saving                     { animation: spin-pulse 1.2s ease infinite; }
+        a { text-decoration: none; }
+
+        /* ── Already-taken card ─────────────────────────────── */
+        .taken-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #f4f6f9;
+        }
+        .taken-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,.10);
+            padding: 48px 40px 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .taken-card .icon-circle {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            background: #e8f5e9;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px; color: #43a047;
+        }
+        .taken-card h2 { margin: 0 0 8px; font-size: 22px; color: #1a1a2e; }
+        .taken-card p  { color: #666; font-size: 14px; margin: 0 0 28px; line-height: 1.6; }
+        .btn-primary-full {
+            display: block; width: 100%;
+            padding: 14px;
+            background: #3b2fd8;
+            color: #fff;
+            border: none; border-radius: 10px;
+            font-size: 16px; font-weight: 600;
+            cursor: pointer; text-align: center;
+            margin-bottom: 12px;
+        }
+        .btn-primary-full:hover { background: #2f25b0; color: #fff; }
+        .btn-ghost {
+            display: block; width: 100%;
+            padding: 12px;
+            background: transparent;
+            color: #888; border: none;
+            font-size: 14px; cursor: pointer;
+        }
+        .btn-ghost:hover { color: #333; }
+
+        /* ── Wait screen ────────────────────────────────────── */
+        .wait-text {
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh;
+        }
+        .wait-text h1 { color: #555; font-size: 24px; }
     </style>
 </head>
+<body>
 
-<body class="bg-slate-50 font-sans antialiased min-h-full">
-
-{# ══════════════════════════════════════════════════════════════
-   DATA INJECTION  (type=application/json — не исполняется как JS)
-   options теперь [{id, text}] вместо [text], чтобы autosave
-   мог слать variant_id, а не искать нужный вариант по тексту.
-══════════════════════════════════════════════════════════════ #}
-{% if test.is_start %}
-<script id="quiz-data" type="application/json">
-[{% for q in question %}{"id":{{ q.id }},"text":"{{ q.text|escapejs }}","img":"{% if q.img %}{{ q.img.url }}{% endif %}","answer":"{% for v in q.answers.all %}{% if v.is_answer %}{{ v.text|escapejs }}{% endif %}{% endfor %}","options":[{% for v in q.answers.all %}{"id":{{ v.id }},"text":"{{ v.text|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}]}{% if not forloop.last %},{% endif %}{% endfor %}]
-</script>
-{% endif %}
-
-
-{# ══════════════════════════════════════════════════════════════
-   ЭКРАН 0 — тест не запущен
-══════════════════════════════════════════════════════════════ #}
-{% if not test.is_start %}
-<div class="min-h-screen flex items-center justify-center p-6">
-    <div class="text-center max-w-sm">
-        <div class="w-20 h-20 bg-amber-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
-            <i class="fa-regular fa-clock text-amber-500 text-3xl"></i>
+{% if existing %}
+    {# ════════════════════════════════════════════════════════
+       SCREEN: Test already taken — show summary card
+       ════════════════════════════════════════════════════════ #}
+    <div class="taken-wrapper">
+        <div class="taken-card">
+            <div class="icon-circle"><i class="fas fa-trophy"></i></div>
+            <h2>Тест уже пройден</h2>
+            <p>
+                Результат: <strong>{{ existing.result }} / {{ existing.totalQuestions }}</strong><br>
+                Процент: <strong>{{ existing.foyiz }}%</strong><br>
+                Дата: <strong>{{ existing.created|date:"d.m.Y" }}</strong><br>
+            </p>
+            <a href="{% url 'test_result' test_id=test.id %}" class="btn-primary-full">
+                Посмотреть результаты
+            </a>
+            <a href="{% url 'home' %}" class="btn-ghost">На главную</a>
         </div>
-        <h2 class="text-2xl font-bold text-slate-800 mb-2">Ожидайте начала</h2>
-        <p class="text-slate-500 text-sm mb-8">
-            Тест ещё не открыт. Когда преподаватель запустит его — страница обновится.
-        </p>
-        <a href="{% url 'home' %}"
-           class="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
-            <i class="fa-solid fa-arrow-left text-xs"></i> На главную
-        </a>
     </div>
-</div>
+
+{% elif not test.is_start %}
+    {# ════════════════════════════════════════════════════════
+       SCREEN: Test not started yet
+       ════════════════════════════════════════════════════════ #}
+    <div class="wait-text"><h1>Ждём начала теста…</h1></div>
 
 {% else %}
+    {# ════════════════════════════════════════════════════════
+       SCREEN: Active test — quiz UI
+       ════════════════════════════════════════════════════════ #}
 
-{# ══════════════════════════════════════════════════════════════
-   ЭКРАН 1 — вступление (скрыт если тест уже пройден)
-══════════════════════════════════════════════════════════════ #}
-<div id="intro-screen"
-     class="{% if test_completed %}hidden {% endif %}min-h-screen flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl shadow-lg border border-slate-100 max-w-md w-full p-8 animate-fade-in">
+    <div class="start_btn"><button>Начать Тест</button></div>
 
-        <div class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <i class="fa-solid fa-clipboard-question text-indigo-600 text-2xl"></i>
+    <div class="info_box">
+        <div class="info-title"><span>Правила теста</span></div>
+        <div class="info-list">
+            <div class="info">1. После того как вы выберете ответ, его нельзя будет отменить.</div>
+            <div class="info">2. После окончания теста нажмите на кнопку «Выйти».</div>
+            <div class="info">3. Вы получите баллы за правильные ответы.</div>
+            <div class="info">4. Количество набранных баллов отображается после завершения теста.</div>
         </div>
-
-        <h1 class="text-2xl font-bold text-slate-800 text-center mb-1">{{ test.name }}</h1>
-        {% if test.desc %}
-        <p class="text-slate-500 text-sm text-center mb-6">{{ test.desc }}</p>
-        {% else %}<div class="mb-6"></div>{% endif %}
-
-        <!-- Счётчик вопросов -->
-        <div class="flex justify-center mb-7">
-            <div class="bg-indigo-50 rounded-2xl px-8 py-4 text-center">
-                <p class="text-3xl font-bold text-indigo-600" id="intro-q-count">—</p>
-                <p class="text-xs text-slate-500 mt-0.5">вопросов</p>
-            </div>
-        </div>
-
-        <!-- Уведомление об автовосстановлении (скрыто по умолчанию) -->
-        <div id="resume-notice"
-             class="hidden mb-5 flex items-center gap-3 bg-amber-50 border border-amber-200
-                    rounded-xl px-4 py-3">
-            <i class="fa-solid fa-rotate-right text-amber-500 shrink-0"></i>
-            <p class="text-sm text-amber-700">
-                Найден незавершённый сеанс. Продолжите с того места, где остановились.
-            </p>
-        </div>
-
-        <!-- Правила -->
-        <div class="bg-slate-50 rounded-2xl p-5 space-y-3 mb-7">
-            <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Правила</p>
-            {% for text in "aaa" %}
-            <div class="flex items-start gap-3">
-                <span class="w-5 h-5 bg-indigo-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                    <i class="fa-solid fa-check text-indigo-600 text-[9px]"></i>
-                </span>
-                <p class="text-sm text-slate-600 leading-relaxed">
-                    {% if forloop.counter == 1 %}Выбранный ответ можно изменить до финальной отправки.
-                    {% elif forloop.counter == 2 %}Ответы автоматически сохраняются в фоне — F5 не страшен.
-                    {% else %}После нажатия «Завершить» изменить ответы невозможно.{% endif %}
-                </p>
-            </div>
-            {% endfor %}
-        </div>
-
-        <button id="start-btn" onclick="startExam()"
-                class="w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white
-                       font-semibold py-3.5 rounded-2xl transition-all duration-150 active:scale-[.98]">
-            Начать тест <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>
-        </button>
-        <div class="text-center mt-4">
-            <a href="{% url 'home' %}" class="text-sm text-slate-400 hover:text-slate-600 transition-colors">
-                Вернуться на главную
-            </a>
+        <div class="buttons">
+            <button class="quit"><a href="{% url 'home' %}">Выйти</a></button>
+            <button class="restart">Далее</button>
         </div>
     </div>
-</div>
 
-
-{# ══════════════════════════════════════════════════════════════
-   ЭКРАН 2 — основной экзамен
-══════════════════════════════════════════════════════════════ #}
-<div id="exam-screen" class="hidden min-h-screen flex-col">
-
-    <!-- Шапка -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-20">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center gap-4">
-
-            <!-- Название теста -->
-            <p class="flex-1 min-w-0 text-sm font-semibold text-slate-700 truncate">{{ test.name }}</p>
-
-            <!-- Прогресс (sm+) -->
-            <div class="hidden sm:flex items-center gap-2.5">
-                <div class="h-1.5 w-28 bg-slate-100 rounded-full overflow-hidden">
-                    <div id="hdr-progress"
-                         class="h-full bg-indigo-500 rounded-full transition-all duration-400"
-                         style="width:0%"></div>
-                </div>
-                <span id="hdr-progress-text" class="text-xs font-medium text-slate-500 tabular-nums w-12">
-                    0 / 0
-                </span>
+    <div class="quiz_box">
+        <header>
+            <div class="title">{{ APP_NAME }}</div>
+        </header>
+        <section>
+            <div class="que_text"></div>
+            <div class="option_list">
+                {% for v in variant %}
+                    {% if v.question_id == question.first.id %}
+                        <div class="option"><span>1</span></div>
+                    {% endif %}
+                {% endfor %}
             </div>
-
-            <!-- Статус автосохранения -->
-            <div id="as-status" class="hidden items-center gap-1.5 text-xs">
-                <i id="as-icon" class="fa-solid fa-cloud-arrow-up text-xs"></i>
-                <span id="as-text" class="text-slate-400">Сохранено</span>
-            </div>
-
-            <!-- Таймер -->
-            <div class="flex items-center gap-1.5">
-                <i class="fa-regular fa-clock text-slate-400 text-sm"></i>
-                <span id="timer" class="text-sm font-mono font-medium text-slate-600 tabular-nums">
-                    00:00
-                </span>
-            </div>
-
-            <!-- Выход -->
-            <a href="{% url 'home' %}"
-               onclick="return confirm('Прогресс будет потерян. Выйти?')"
-               class="text-xs text-slate-400 hover:text-rose-500 hover:bg-rose-50 px-2.5 py-1.5 rounded-lg transition-all">
-                Выйти
-            </a>
-        </div>
-    </header>
-
-    <!-- Тело -->
-    <div class="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-6 flex gap-6 items-start">
-
-        <!-- Боковая панель (md+) -->
-        <aside class="hidden md:block w-52 shrink-0 sticky top-20">
-            <div class="bg-white rounded-2xl border border-slate-200 p-4">
-                <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-3">Вопросы</p>
-                <div id="nav-grid" class="grid grid-cols-5 gap-1.5 mb-4"></div>
-                <div class="space-y-2 pt-3 border-t border-slate-100">
-                    <div class="flex items-center gap-2">
-                        <span class="w-4 h-4 rounded bg-indigo-600 shrink-0"></span>
-                        <span class="text-[11px] text-slate-500">Текущий</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="w-4 h-4 rounded bg-indigo-100 border border-indigo-300 shrink-0"></span>
-                        <span class="text-[11px] text-slate-500">Отвечен</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="w-4 h-4 rounded border border-slate-200 bg-white shrink-0"></span>
-                        <span class="text-[11px] text-slate-500">Пропущен</span>
-                    </div>
-                </div>
-            </div>
-            <div class="mt-3 bg-white rounded-2xl border border-slate-200 p-4">
-                <div class="flex justify-between text-xs mb-1.5">
-                    <span class="text-slate-500">Отвечено</span>
-                    <span id="aside-answered" class="font-semibold text-slate-700 tabular-nums">0 / 0</span>
-                </div>
-                <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div id="aside-bar" class="h-full bg-indigo-500 rounded-full transition-all duration-400"
-                         style="width:0%"></div>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Основная область -->
-        <main class="flex-1 min-w-0">
-
-            <!-- Мобильная навигация -->
-            <div class="md:hidden bg-white rounded-2xl border border-slate-200 p-3 mb-4">
-                <div id="nav-mobile" class="flex gap-1.5 overflow-x-auto pb-0.5"></div>
-            </div>
-
-            <!-- Карточка вопроса -->
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-slate-100">
-                    <span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
-                        Вопрос&nbsp;<span id="q-num">1</span>&nbsp;из&nbsp;<span id="q-total">0</span>
-                    </span>
-                    <span id="q-answered-badge"
-                          class="hidden items-center gap-1.5 text-xs text-emerald-600
-                                 bg-emerald-50 px-2.5 py-1 rounded-full font-medium">
-                        <i class="fa-solid fa-circle-check"></i> Отвечен
-                    </span>
-                </div>
-                <div class="px-5 sm:px-6 pt-6 pb-2">
-                    <p id="q-text"
-                       class="text-base sm:text-lg font-medium text-slate-800 leading-relaxed animate-fade-in">
-                    </p>
-                    <div id="q-img-wrap" class="hidden mt-4">
-                        <img id="q-img" src="" alt=""
-                             class="rounded-xl max-h-64 object-contain border border-slate-100 shadow-sm">
-                    </div>
-                </div>
-                <div id="options" class="px-5 sm:px-6 pb-6 pt-4 space-y-2.5"></div>
-            </div>
-
-            <!-- Кнопки навигации -->
-            <div class="flex items-center justify-between gap-3 mt-4">
-                <button id="btn-prev" onclick="navigate(-1)" disabled
-                        class="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200
-                               text-slate-600 font-medium text-sm hover:bg-slate-50 hover:border-slate-300
-                               transition-all disabled:opacity-35 disabled:cursor-not-allowed">
-                    <i class="fa-solid fa-arrow-left text-xs"></i> Назад
-                </button>
-                <div class="flex-1 sm:hidden">
-                    <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                        <div id="mob-progress" class="h-full bg-indigo-500 rounded-full transition-all duration-400"
-                             style="width:0%"></div>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button id="btn-submit" onclick="confirmSubmit()"
-                            class="hidden items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600
-                                   hover:bg-emerald-500 text-white font-medium text-sm transition-all active:scale-[.97]">
-                        <i class="fa-solid fa-paper-plane text-xs"></i> Завершить тест
-                    </button>
-                    <button id="btn-next" onclick="navigate(1)"
-                            class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600
-                                   hover:bg-indigo-500 text-white font-medium text-sm transition-all
-                                   active:scale-[.97] disabled:opacity-35 disabled:cursor-not-allowed">
-                        Вперёд <i class="fa-solid fa-arrow-right text-xs"></i>
-                    </button>
-                </div>
-            </div>
-        </main>
+        </section>
+        <footer>
+            <div class="total_que"></div>
+            <button class="next_btn">Следующий вопрос</button>
+        </footer>
     </div>
-</div><!-- /exam-screen -->
 
-
-{# ══════════════════════════════════════════════════════════════
-   ЭКРАН 3 — модал подтверждения отправки
-══════════════════════════════════════════════════════════════ #}
-<div id="modal-overlay"
-     class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 items-center justify-center p-4"
-     onclick="closeModal(event)">
-    <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 text-center animate-fade-in"
-         onclick="event.stopPropagation()">
-        <div class="w-14 h-14 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
-            <i class="fa-solid fa-triangle-exclamation text-amber-500 text-xl"></i>
-        </div>
-        <h3 class="text-xl font-bold text-slate-800 mb-2">Завершить тест?</h3>
-        <p id="modal-body" class="text-slate-500 text-sm leading-relaxed mb-7"></p>
-        <div class="flex gap-3">
-            <button onclick="hideModal()"
-                    class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600
-                           font-medium text-sm hover:bg-slate-50 transition-all">
-                Продолжить
-            </button>
-            <button onclick="showResults()"
-                    class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500
-                           text-white font-semibold text-sm transition-all active:scale-[.97]">
-                Отправить
-            </button>
+    <div class="result_box">
+        <div class="icon"><i class="fas fa-crown"></i></div>
+        <div class="complete_text">Тест закончен</div>
+        <div class="score_text"></div>
+        <div class="buttons">
+            <form method="post" id="results-id">
+                {% csrf_token %}
+                <div class="result_for_backend"></div>
+                <button type="submit" class="quit">Выйти</button>
+            </form>
         </div>
     </div>
-</div>
 
+    {# ── Data injection (JSON, not executed as JS) ─────────────────────── #}
+    <script id="questions-data" type="application/json">
+    [
+        {% for q in question %}
+        {
+            "id":      {{ q.id }},
+            "question": "{{ q.text|escapejs }}",
+            "answer":  "{% for a in variant %}{% if a.question_id == q.id and a.is_answer %}{{ a.text|escapejs }}{% endif %}{% endfor %}",
+            "options": [
+                {% for v in variant %}
+                    {% if v.question_id == q.id %}
+                    {"id": {{ v.id }}, "text": "{{ v.text|escapejs }}"}{% if not forloop.last %},{% endif %}
+                    {% endif %}
+                {% endfor %}
+            ]
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ]
+    </script>
 
-{# ══════════════════════════════════════════════════════════════
-   ЭКРАН 4 — итоги (показывается ДО финального сабмита)
-══════════════════════════════════════════════════════════════ #}
-<div id="results-screen" class="hidden min-h-screen bg-slate-50 items-center justify-center p-4">
-    <div class="bg-white rounded-3xl shadow-lg border border-slate-100 max-w-md w-full p-8 text-center animate-fade-in">
+    <script src="{% static 'script.js' %}"></script>
+    <script>
+        // Parse questions from the JSON data block (safe — never executed as code)
+        const questions = JSON.parse(
+            document.getElementById("questions-data").textContent
+        );
 
-        <!-- Кольцо результата -->
-        <div class="relative inline-flex items-center justify-center mb-6">
-            <svg viewBox="0 0 120 120" class="w-32 h-32">
-                <circle cx="60" cy="60" r="52" fill="none" stroke="#e2e8f0" stroke-width="10"/>
-                <circle id="score-ring" cx="60" cy="60" r="52" fill="none"
-                        stroke="#4f46e5" stroke-width="10" stroke-linecap="round"
-                        stroke-dasharray="326.7" stroke-dashoffset="326.7"
-                        transform="rotate(-90 60 60)"
-                        style="transition: stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)"/>
-            </svg>
-            <div class="absolute text-center">
-                <p id="res-pct" class="text-2xl font-bold text-slate-800">0%</p>
-            </div>
-        </div>
+        function showQuetions(index) {
+            const que_text   = document.querySelector(".que_text");
+            const option_list = document.querySelector(".option_list");
 
-        <h2 id="res-message" class="text-xl font-bold text-slate-800 mb-1">Тест завершён</h2>
-        <p class="text-slate-500 text-sm mb-6">{{ test.name }}</p>
+            que_text.innerHTML = "<span>" + questions[index].question + "</span>";
 
-        <!-- Стата (3 ячейки) -->
-        <div class="grid grid-cols-3 gap-3 mb-6">
-            <div class="bg-slate-50 rounded-xl p-3">
-                <p id="res-correct" class="text-xl font-bold text-emerald-600">0</p>
-                <p class="text-xs text-slate-500 mt-0.5">Верных</p>
-            </div>
-            <div class="bg-slate-50 rounded-xl p-3">
-                <p id="res-wrong" class="text-xl font-bold text-rose-500">0</p>
-                <p class="text-xs text-slate-500 mt-0.5">Неверных</p>
-            </div>
-            <div class="bg-slate-50 rounded-xl p-3">
-                <p id="res-time" class="text-xl font-bold text-slate-700 font-mono">00:00</p>
-                <p class="text-xs text-slate-500 mt-0.5">Время</p>
-            </div>
-        </div>
-
-        <!-- Разбор ошибок (сворачиваемый) -->
-        <div id="breakdown-section" class="text-left mb-6 hidden">
-            <button onclick="toggleBreakdown()"
-                    class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl
-                           bg-slate-50 hover:bg-slate-100 transition-colors text-sm font-medium text-slate-600 mb-2">
-                <span>Разбор ошибок</span>
-                <i id="breakdown-icon" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
-            </button>
-            <div id="breakdown-list" class="space-y-1.5 hidden max-h-48 overflow-y-auto"></div>
-        </div>
-
-        <!-- Финальная кнопка -->
-        <button id="finish-btn" onclick="finishAndSubmit()"
-                class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold
-                       py-3.5 rounded-2xl transition-all active:scale-[.98] flex items-center justify-center gap-2">
-            <i class="fa-solid fa-check"></i> Завершить и выйти
-        </button>
-    </div>
-</div>
-
-
-{# ══════════════════════════════════════════════════════════════
-   ЭКРАН 5 — тест уже пройден (сервер OR localStorage)
-══════════════════════════════════════════════════════════════ #}
-<div id="completed-screen"
-     class="{% if test_completed %}{% else %}hidden {% endif %}min-h-screen bg-slate-50
-            flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl shadow-lg border border-slate-100 max-w-sm w-full p-8 text-center">
-        <div class="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
-            <i class="fa-solid fa-trophy text-emerald-600 text-2xl"></i>
-        </div>
-        <h2 class="text-xl font-bold text-slate-800 mb-2">Тест уже пройден</h2>
-        <p class="text-slate-500 text-sm mb-7">
-            Повторное прохождение недоступно. Результат сохранён.
-        </p>
-        <a href="{% url 'user_profile' %}"
-           class="w-full inline-block text-center bg-indigo-600 hover:bg-indigo-500 text-white
-                  font-semibold py-3 rounded-2xl transition-all mb-3">
-            Посмотреть результаты
-        </a>
-        <a href="{% url 'home' %}" class="block text-sm text-slate-400 hover:text-slate-600 transition-colors">
-            На главную
-        </a>
-    </div>
-</div>
-
-
-{# Скрытая форма — запасной путь (fallback если fetch не сработал) #}
-<form id="submit-form" method="post"
-      action="{% url 'test' test_id=test.id %}" class="hidden">
-    {% csrf_token %}
-    <input type="hidden" name="result" id="result-input" value="0">
-</form>
-
-{% endif %}{# end test.is_start #}
-
-
-{# ══════════════════════════════════════════════════════════════
-   JAVASCRIPT
-══════════════════════════════════════════════════════════════ #}
-{% if test.is_start %}
-<script>
-'use strict';
-
-/* ──────────────────────────────────────────────────────────────
-   КОНФИГУРАЦИЯ
-────────────────────────────────────────────────────────────── */
-const TEST_ID   = {{ test.id }};
-const STATE_KEY = `cyb_quiz_${TEST_ID}`;
-
-const URL_AUTOSAVE = "{% url 'test_autosave' %}";
-const URL_FINALIZE = "{% url 'test_finalize' %}";
-const URL_HOME     = "{% url 'home' %}";
-
-/* ──────────────────────────────────────────────────────────────
-   ДАННЫЕ (из Django)
-────────────────────────────────────────────────────────────── */
-const QUESTIONS = JSON.parse(document.getElementById('quiz-data').textContent);
-
-/* ──────────────────────────────────────────────────────────────
-   СОСТОЯНИЕ
-   userAnswers[i] = null | { id: variantId, text: "..." }
-────────────────────────────────────────────────────────────── */
-let currentIdx    = 0;
-let _timerSecs    = 0;
-let _startedAt    = 0;
-let _timerRef     = null;
-let _correctCount = 0;
-
-// Инициализируем массив ПОСЛЕ парсинга QUESTIONS
-const userAnswers = new Array(QUESTIONS.length).fill(null);
-
-/* ──────────────────────────────────────────────────────────────
-   CSRF — читаем из cookie для fetch-запросов
-────────────────────────────────────────────────────────────── */
-function _getCsrf() {
-    const m = document.cookie.match(/csrftoken=([^;]+)/);
-    return m ? decodeURIComponent(m[1]) : '';
-}
-
-/* ──────────────────────────────────────────────────────────────
-   AUTOSAVE — debounce 2 сек + статус-индикатор
-────────────────────────────────────────────────────────────── */
-let _asTimer = null;
-
-/**
- * Вызывается после каждого выбора ответа.
- * Ждёт 2 секунды без новых вызовов, потом делает fetch.
- */
-function _scheduleAutosave(questionId, variantId) {
-    _setAsStatus('saving');
-    clearTimeout(_asTimer);
-    _asTimer = setTimeout(() => _performAutosave(questionId, variantId), 2000);
-}
-
-async function _performAutosave(questionId, variantId) {
-    try {
-        const res = await fetch(URL_AUTOSAVE, {
-            method:  'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken':  _getCsrf(),
-            },
-            body: JSON.stringify({
-                test_id:     TEST_ID,
-                question_id: questionId,
-                variant_id:  variantId,   // int или null
-            }),
-        });
-        _setAsStatus(res.ok ? 'saved' : 'error');
-    } catch {
-        _setAsStatus('error');
-    }
-}
-
-/** Обновляет иконку+текст автосохранения в шапке. */
-function _setAsStatus(state) {
-    const wrap = document.getElementById('as-status');
-    const icon = document.getElementById('as-icon');
-    const text = document.getElementById('as-text');
-    if (!wrap) return;
-
-    wrap.classList.remove('hidden');
-    wrap.classList.add('flex');
-
-    if (state === 'saving') {
-        icon.className = 'fa-solid fa-cloud-arrow-up text-xs text-amber-400 as-saving';
-        text.textContent = 'Сохраняю...';
-        text.className   = 'text-amber-500 text-xs';
-    } else if (state === 'saved') {
-        icon.className = 'fa-solid fa-cloud-check text-xs text-emerald-500';
-        text.textContent = 'Сохранено';
-        text.className   = 'text-emerald-600 text-xs';
-        // Скрываем через 2.5 сек
-        setTimeout(() => {
-            wrap.classList.add('hidden');
-            wrap.classList.remove('flex');
-        }, 2500);
-    } else {
-        icon.className = 'fa-solid fa-cloud-exclamation text-xs text-rose-400';
-        text.textContent = 'Ошибка сохранения';
-        text.className   = 'text-rose-500 text-xs';
-    }
-}
-
-/* ──────────────────────────────────────────────────────────────
-   LOCALSTORAGE — промежуточное состояние
-────────────────────────────────────────────────────────────── */
-function _loadState() {
-    try { return JSON.parse(localStorage.getItem(STATE_KEY)); } catch { return null; }
-}
-
-function _saveState(extra = {}) {
-    localStorage.setItem(STATE_KEY, JSON.stringify({
-        status:       'in_progress',
-        currentIdx,
-        userAnswers:  [...userAnswers],
-        startedAt:    _startedAt,
-        elapsedSecs:  _timerSecs,
-        ...extra,
-    }));
-}
-
-function _clearState() {
-    localStorage.removeItem(STATE_KEY);
-}
-
-/* ──────────────────────────────────────────────────────────────
-   ИНИЦИАЛИЗАЦИЯ
-────────────────────────────────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
-    const el = document.getElementById('intro-q-count');
-    if (el) el.textContent = QUESTIONS.length;
-
-    // Если сессия in_progress — показываем уведомление и меняем кнопку
-    const saved = _loadState();
-    if (saved?.status === 'in_progress') {
-        const notice = document.getElementById('resume-notice');
-        const btn    = document.getElementById('start-btn');
-        if (notice) notice.classList.remove('hidden');
-        if (notice) notice.classList.add('flex');
-        if (btn) {
-            btn.innerHTML = '↻ Продолжить тест <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>';
-            btn.classList.replace('bg-indigo-600', 'bg-amber-500');
-            btn.classList.replace('hover:bg-indigo-500', 'hover:bg-amber-400');
-            btn.classList.replace('active:bg-indigo-700', 'active:bg-amber-600');
+            const opts = questions[index].options;
+            let optHtml = "";
+            opts.forEach(function(opt) {
+                optHtml += '<div class="option" onclick="optionSelected(this)">'
+                         + opt.text + "</div>";
+            });
+            option_list.innerHTML = optHtml;
         }
-    }
-    // Если localStorage тоже говорит "completed" — показываем экран 5
-    if (saved?.status === 'completed') {
-        document.getElementById('intro-screen')?.classList.add('hidden');
-        const cs = document.getElementById('completed-screen');
-        if (cs) { cs.classList.remove('hidden'); cs.classList.add('flex'); }
-    }
-});
-
-/* ──────────────────────────────────────────────────────────────
-   СТАРТ ТЕСТА
-────────────────────────────────────────────────────────────── */
-function startExam() {
-    const saved = _loadState();
-
-    if (saved?.status === 'completed') {
-        document.getElementById('intro-screen').classList.add('hidden');
-        const cs = document.getElementById('completed-screen');
-        cs.classList.remove('hidden'); cs.classList.add('flex');
-        return;
-    }
-
-    if (saved?.status === 'in_progress') {
-        // Восстанавливаем состояние
-        saved.userAnswers.forEach((a, i) => { if (i < userAnswers.length) userAnswers[i] = a; });
-        currentIdx = saved.currentIdx || 0;
-        _timerSecs = saved.elapsedSecs || 0;
-        _startedAt = saved.startedAt  || Date.now();
-    } else {
-        _startedAt = Date.now();
-        _saveState();
-    }
-
-    document.getElementById('intro-screen').classList.add('hidden');
-    const screen = document.getElementById('exam-screen');
-    screen.classList.remove('hidden'); screen.classList.add('flex', 'flex-col');
-
-    _buildNavGrids();
-    _render(currentIdx);
-    _startTimer();
-}
-
-/* ──────────────────────────────────────────────────────────────
-   НАВИГАЦИОННАЯ СЕТКА
-────────────────────────────────────────────────────────────── */
-function _buildNavGrids() {
-    ['nav-grid', 'nav-mobile'].forEach(id => {
-        const container = document.getElementById(id);
-        if (!container) return;
-        container.innerHTML = '';
-        QUESTIONS.forEach((_, i) => container.appendChild(_makeNavBtn(i)));
-    });
-    document.getElementById('q-total').textContent = QUESTIONS.length;
-}
-
-function _makeNavBtn(i) {
-    const btn = document.createElement('button');
-    btn.dataset.navIdx = i;
-    btn.textContent    = i + 1;
-    btn.onclick        = () => goTo(i);
-    _styleNavBtn(btn, i);
-    return btn;
-}
-
-function _styleNavBtn(btn, i) {
-    const base = 'w-8 h-8 text-xs font-semibold rounded-lg transition-all shrink-0 ' +
-                 'focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-1';
-    if (i === currentIdx) {
-        btn.className = base + ' bg-indigo-600 text-white shadow-md shadow-indigo-200';
-    } else if (userAnswers[i] !== null) {
-        btn.className = base + ' bg-indigo-100 text-indigo-700 border border-indigo-300';
-    } else {
-        btn.className = base + ' bg-white text-slate-500 border border-slate-200 ' +
-                        'hover:border-indigo-300 hover:text-indigo-600';
-    }
-}
-
-function _refreshNav() {
-    document.querySelectorAll('[data-nav-idx]').forEach(btn =>
-        _styleNavBtn(btn, parseInt(btn.dataset.navIdx)));
-}
-
-/* ──────────────────────────────────────────────────────────────
-   РЕНДЕР ВОПРОСА
-────────────────────────────────────────────────────────────── */
-function _render(idx) {
-    const q = QUESTIONS[idx];
-
-    document.getElementById('q-num').textContent = idx + 1;
-
-    // Бейдж «Отвечен»
-    const badge = document.getElementById('q-answered-badge');
-    if (userAnswers[idx] !== null) {
-        badge.classList.remove('hidden'); badge.classList.add('flex');
-    } else {
-        badge.classList.add('hidden'); badge.classList.remove('flex');
-    }
-
-    // Текст вопроса с анимацией
-    const qText = document.getElementById('q-text');
-    qText.classList.remove('animate-fade-in');
-    void qText.offsetWidth;
-    qText.classList.add('animate-fade-in');
-    qText.textContent = q.text;
-
-    // Изображение
-    const imgWrap = document.getElementById('q-img-wrap');
-    if (q.img) {
-        document.getElementById('q-img').src = q.img;
-        imgWrap.classList.remove('hidden');
-    } else {
-        imgWrap.classList.add('hidden');
-    }
-
-    // Варианты ответов
-    const container = document.getElementById('options');
-    container.innerHTML = '';
-    q.options.forEach((opt, optIdx) =>
-        container.appendChild(_makeOption(opt, optIdx, idx)));
-
-    // Кнопки prev / next / submit
-    document.getElementById('btn-prev').disabled = (idx === 0);
-    const isLast      = idx === QUESTIONS.length - 1;
-    const allAnswered = userAnswers.every(a => a !== null);
-    const btnNext   = document.getElementById('btn-next');
-    const btnSubmit = document.getElementById('btn-submit');
-
-    if (isLast) {
-        btnNext.classList.add('hidden');
-        btnSubmit.classList.remove('hidden'); btnSubmit.classList.add('flex');
-    } else {
-        btnNext.classList.remove('hidden'); btnNext.disabled = false;
-        if (allAnswered) {
-            btnSubmit.classList.remove('hidden'); btnSubmit.classList.add('flex');
-        } else {
-            btnSubmit.classList.add('hidden'); btnSubmit.classList.remove('flex');
-        }
-    }
-
-    _refreshNav();
-    _updateProgress();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-/* ──────────────────────────────────────────────────────────────
-   КАРТОЧКА ВАРИАНТА ОТВЕТА
-   opt = {id: variantId, text: "..."}
-────────────────────────────────────────────────────────────── */
-function _makeOption(opt, optIdx, qIdx) {
-    // Сравниваем по ID варианта (не по тексту — надёжнее)
-    const selected = (userAnswers[qIdx]?.id === opt.id);
-    const letter   = String.fromCharCode(65 + optIdx);
-
-    const label = document.createElement('label');
-    label.className = [
-        'opt-card flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer select-none',
-        selected ? 'opt-sel border-indigo-500' : 'border-slate-100 bg-white',
-    ].join(' ');
-    label.htmlFor = `opt-${qIdx}-${optIdx}`;
-
-    const radio = document.createElement('input');
-    radio.type     = 'radio';
-    radio.name     = `q-${qIdx}`;
-    radio.id       = `opt-${qIdx}-${optIdx}`;
-    radio.value    = String(opt.id);   // value = variant ID
-    radio.checked  = selected;
-    radio.className = 'sr-only';
-    radio.addEventListener('change', () => {
-        userAnswers[qIdx] = { id: opt.id, text: opt.text };
-        _render(currentIdx);
-        _saveState();
-        // Запускаем debounced autosave с ID варианта
-        _scheduleAutosave(QUESTIONS[qIdx].id, opt.id);
-    });
-
-    const badge = document.createElement('span');
-    badge.className = [
-        'opt-badge w-8 h-8 rounded-lg flex items-center justify-center',
-        'text-xs font-bold shrink-0 transition-all',
-        selected ? 'opt-badge-sel' : 'bg-slate-100 text-slate-500',
-    ].join(' ');
-    badge.textContent = letter;
-
-    const span = document.createElement('span');
-    span.className  = 'flex-1 text-sm font-medium ' + (selected ? 'text-indigo-800' : 'text-slate-700');
-    span.textContent = opt.text;
-
-    const check = document.createElement('i');
-    check.className = 'fa-solid fa-circle-check text-lg shrink-0 ' +
-                      (selected ? 'text-indigo-500' : 'text-transparent');
-
-    label.append(radio, badge, span, check);
-    return label;
-}
-
-/* ──────────────────────────────────────────────────────────────
-   НАВИГАЦИЯ
-────────────────────────────────────────────────────────────── */
-function goTo(idx) {
-    if (idx < 0 || idx >= QUESTIONS.length) return;
-    currentIdx = idx;
-    _render(currentIdx);
-    _saveState();
-}
-
-function navigate(delta) { goTo(currentIdx + delta); }
-
-// Стрелки клавиатуры
-document.addEventListener('keydown', e => {
-    if (document.getElementById('exam-screen').classList.contains('hidden')) return;
-    if (e.key === 'ArrowRight') navigate(1);
-    if (e.key === 'ArrowLeft')  navigate(-1);
-});
-
-/* ──────────────────────────────────────────────────────────────
-   ПРОГРЕСС
-────────────────────────────────────────────────────────────── */
-function _updateProgress() {
-    const answered = userAnswers.filter(a => a !== null).length;
-    const total    = QUESTIONS.length;
-    const pct      = total > 0 ? (answered / total) * 100 : 0;
-
-    ['hdr-progress', 'mob-progress', 'aside-bar'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.width = pct + '%';
-    });
-    const txt = answered + ' / ' + total;
-    ['hdr-progress-text', 'aside-answered'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = txt;
-    });
-}
-
-/* ──────────────────────────────────────────────────────────────
-   ТАЙМЕР
-────────────────────────────────────────────────────────────── */
-function _startTimer() {
-    _timerRef = setInterval(() => {
-        _timerSecs++;
-        const m  = String(Math.floor(_timerSecs / 60)).padStart(2, '0');
-        const s  = String(_timerSecs % 60).padStart(2, '0');
-        const el = document.getElementById('timer');
-        if (el) el.textContent = m + ':' + s;
-        // Периодически обновляем elapsedSecs в localStorage (каждые 15 сек)
-        if (_timerSecs % 15 === 0) _saveState();
-    }, 1000);
-}
-
-/* ──────────────────────────────────────────────────────────────
-   ПОДТВЕРЖДЕНИЕ → ЭКРАН ИТОГОВ
-────────────────────────────────────────────────────────────── */
-function confirmSubmit() {
-    const unanswered = userAnswers.filter(a => a === null).length;
-    const answered   = QUESTIONS.length - unanswered;
-    const body       = document.getElementById('modal-body');
-
-    body.innerHTML = unanswered > 0
-        ? `Вы ответили на <strong class="text-slate-800">${answered} из ${QUESTIONS.length}</strong> вопросов. Пропущенные засчитаются неверными.`
-        : `Вы ответили на все <strong class="text-slate-800">${QUESTIONS.length}</strong> вопросов. Готовы отправить?`;
-
-    const o = document.getElementById('modal-overlay');
-    o.classList.remove('hidden'); o.classList.add('flex');
-}
-
-function hideModal() {
-    const o = document.getElementById('modal-overlay');
-    o.classList.add('hidden'); o.classList.remove('flex');
-}
-
-function closeModal(e) {
-    if (e.target === document.getElementById('modal-overlay')) hideModal();
-}
-
-/* ──────────────────────────────────────────────────────────────
-   ЭКРАН ИТОГОВ (показывается ДО финальной отправки)
-────────────────────────────────────────────────────────────── */
-function showResults() {
-    hideModal();
-
-    // Подсчёт правильных (по тексту — для отображения на клиенте)
-    const details = QUESTIONS.map((q, i) => ({
-        text:     q.text,
-        userText: userAnswers[i]?.text ?? null,
-        correct:  q.answer,
-        isRight:  userAnswers[i]?.text === q.answer,
-    }));
-    _correctCount = details.filter(d => d.isRight).length;
-    const total   = QUESTIONS.length;
-    const pct     = total > 0 ? Math.round(_correctCount / total * 100) : 0;
-
-    if (_timerRef) clearInterval(_timerRef);
-
-    // Сохраняем "completed" в localStorage
-    _saveState({ status: 'completed', score: _correctCount, total });
-
-    // Показываем экран 4, скрываем экран 2
-    document.getElementById('exam-screen').classList.add('hidden');
-    document.getElementById('exam-screen').classList.remove('flex', 'flex-col');
-    const rs = document.getElementById('results-screen');
-    rs.classList.remove('hidden'); rs.classList.add('flex');
-
-    // Анимация кольца
-    const ring  = document.getElementById('score-ring');
-    const circ  = 2 * Math.PI * 52; // 326.7
-    const color = pct >= 90 ? '#10b981' : pct >= 70 ? '#4f46e5' : pct >= 50 ? '#f59e0b' : '#ef4444';
-    ring.style.stroke = color;
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-        ring.style.strokeDashoffset = String(circ * (1 - pct / 100));
-    }));
-
-    // Тексты
-    const pctEl = document.getElementById('res-pct');
-    pctEl.textContent = pct + '%'; pctEl.style.color = color;
-    document.getElementById('res-correct').textContent = _correctCount;
-    document.getElementById('res-wrong').textContent   = total - _correctCount;
-    const m = String(Math.floor(_timerSecs / 60)).padStart(2, '0');
-    const s = String(_timerSecs % 60).padStart(2, '0');
-    document.getElementById('res-time').textContent = m + ':' + s;
-
-    const msgs = [[90,'Отлично! 🎉'], [70,'Хороший результат!'], [50,'Можно лучше'], [0,'Требует повторения']];
-    document.getElementById('res-message').textContent =
-        (msgs.find(([t]) => pct >= t) || msgs[3])[1];
-
-    // Разбор ошибок
-    const wrongs = details.filter(d => !d.isRight);
-    if (wrongs.length > 0) {
-        document.getElementById('breakdown-section').classList.remove('hidden');
-        document.getElementById('breakdown-list').innerHTML = wrongs.map(d => `
-            <div class="flex items-start gap-3 px-3 py-2.5 rounded-xl bg-rose-50">
-                <i class="fa-solid fa-circle-xmark text-rose-500 shrink-0 mt-0.5"></i>
-                <div class="min-w-0">
-                    <p class="text-xs text-slate-600 truncate">${_esc(d.text)}</p>
-                    <p class="text-xs text-emerald-700 mt-0.5">✓ ${_esc(d.correct || '—')}</p>
-                </div>
-            </div>`).join('');
-    }
-}
-
-function toggleBreakdown() {
-    document.getElementById('breakdown-list').classList.toggle('hidden');
-    document.getElementById('breakdown-icon').classList.toggle('rotate-180');
-}
-
-/* ──────────────────────────────────────────────────────────────
-   ФИНАЛЬНАЯ ОТПРАВКА (fetch → /test/finalize/ + fallback)
-────────────────────────────────────────────────────────────── */
-async function finishAndSubmit() {
-    const btn = document.getElementById('finish-btn');
-    if (btn) { btn.disabled = true; btn.textContent = 'Отправляю...'; }
-
-    // Строим fallback-map: {question_id_str: variant_id}
-    const answers = {};
-    QUESTIONS.forEach((q, i) => {
-        if (userAnswers[i] !== null) {
-            answers[String(q.id)] = userAnswers[i].id;
-        }
-    });
-
-    _clearState();
-
-    try {
-        const resp = await fetch(URL_FINALIZE, {
-            method:  'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken':  _getCsrf(),
-            },
-            body: JSON.stringify({ test_id: TEST_ID, answers }),
-        });
-
-        if (resp.ok) {
-            window.location.href = URL_HOME;
-            return;
-        }
-        // Сервер вернул ошибку — используем fallback форму
-        console.warn('finalize returned', resp.status);
-    } catch (err) {
-        console.warn('finalize fetch failed:', err);
-    }
-
-    // ── Fallback: старая форма с result count ──
-    document.getElementById('result-input').value = _correctCount;
-    document.getElementById('submit-form').submit();
-}
-
-/* ──────────────────────────────────────────────────────────────
-   УТИЛИТЫ
-────────────────────────────────────────────────────────────── */
-function _esc(s) {
-    return String(s)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-}
-</script>
+    </script>
 {% endif %}
 
 </body>
