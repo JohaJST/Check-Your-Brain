@@ -183,7 +183,7 @@ def home(request, status="subject", subject_id=None, classroom_id=None, user_id=
 @login_required(login_url="login")
 def lock(request):
     """Render the dashboard password gate (GET) or verify it (POST)."""
-    if not request.user.is_admin:
+    if request.user.role == 4:
         return redirect("home")
 
     if request.method == "POST":
