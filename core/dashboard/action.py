@@ -153,7 +153,7 @@ def form(req):
             return render(
                 req,
                 "pages/dashboard/form.html",
-                {"classrooms": c, "error": "Пользователь добавлен"},
+                {"classrooms": c, "success": "Пользователь добавлен"},
             )
         return render(req, "pages/dashboard/form.html", {"classrooms": c})
     else:

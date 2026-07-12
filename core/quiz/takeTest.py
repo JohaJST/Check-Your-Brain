@@ -68,6 +68,7 @@ def test(request, test_id):
         "test":     test_obj,
         "existing": existing,   # None → fresh; Result obj → already taken
     }
+    print(ctx)
     return render(request, "test.html", ctx)
 
 
