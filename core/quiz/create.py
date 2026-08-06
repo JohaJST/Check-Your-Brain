@@ -1,46 +1,63 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from core.models import ClassRooms, Subject, Question, Variant, Test, TestClassRoom
+from django.shortcuts import redirect, render
+
+from core.models import (
+    ClassRooms,
+    Question,
+    Subject,
+    Test,
+    TestClassRoom,
+    TestVarianta,
+    Variant,
+)
 
 
 @login_required(login_url="login")
 def new_test(request):
-    is_subject = request.GET.get("is_subject")
-    class_rooms = ClassRooms.objects.all()
-    subjects = Subject.objects.all()
-    return render(request, "pages/dashboard/new.html", {"classrooms": class_rooms, "subjects": subjects})
+    return render(request, "pages/dashboard/new.html", {
+        "classrooms": ClassRooms.objects.all(),
+        "subjects": Subject.objects.all(),
+    })
 
 
 @login_required(login_url="login")
 def create_test(request):
-    if request.method == 'POST':
-        subject = Subject.objects.get(id=request.POST.get('subject'))
-        test_name = Test.objects.create(name=request.POST.get('test_name'), subject=subject)
-        question_counter = 1
-        try:
-            tscr = TestClassRoom.objects.create(test_id=test_name.id, classroom_id=ClassRooms.objects.get(id=request.POST.get('classroom_1')).id)
-            tscr.create()
-            tscr = TestClassRoom.objects.create(test_id=test_name.id, classroom_id=ClassRooms.objects.get(id=request.POST.get('classroom_2')).id)
-            tscr.create()
-            tscr = TestClassRoom.objects.create(test_id=test_name.id, classroom_id=ClassRooms.objects.get(id=request.POST.get('classroom_3')).id)
-            tscr.create()
-            tscr = TestClassRoom.objects.create(test_id=test_name.id, classroom_id=ClassRooms.objects.get(id=request.POST.get('classroom_4')).id)
-            tscr.create()
-        except:
-            print(123)
-        while f'question_{question_counter}' in request.POST:
-            question_text = request.POST[f'question_{question_counter}']
-            question = Question.objects.create(text=question_text, test=test_name)
-            variant_counter = 1
-            while f'variant_{question_counter}_{variant_counter}' in request.POST:
-                variant_text = request.POST[f'variant_{question_counter}_{variant_counter}']
-                is_answer = f'answer_{question_counter}_{variant_counter}' in request.POST
-                Variant.objects.create(text=variant_text, is_answer=is_answer, question=question)
+    if request.method != 'POST':
+        return redirect("dashboard")
 
-                variant_counter += 1
+    subject = Subject.objects.get(id=request.POST.get('subject'))
+    test = Test.objects.create(
+        name=request.POST.get('test_name'),
+        subject=subject,
+    )
 
-            question_counter += 1
+    # Создаём первый (и единственный на данном этапе) вариант теста.
+    test_varianta = TestVarianta.objects.create(test=test, variant=1)
 
-        return redirect('dashboard')
-    return redirect("dashboard")
+    # Привязываем классы к тесту: перебираем ключи classroom_1, classroom_2, ...
+    # без жёсткого ограничения в 4 класса.
+    idx = 1
+    while f'classroom_{idx}' in request.POST:
+        classroom_id = request.POST.get(f'classroom_{idx}')
+        if classroom_id:
+            TestClassRoom.objects.get_or_create(test=test, classroom_id=int(classroom_id))
+        idx += 1
 
+    # Создаём вопросы и варианты ответов для варианта теста.
+    q_idx = 1
+    while f'question_{q_idx}' in request.POST:
+        question = Question.objects.create(
+            text=request.POST[f'question_{q_idx}'],
+            varianta=test_varianta,
+        )
+        v_idx = 1
+        while f'variant_{q_idx}_{v_idx}' in request.POST:
+            Variant.objects.create(
+                text=request.POST[f'variant_{q_idx}_{v_idx}'],
+                is_answer=f'answer_{q_idx}_{v_idx}' in request.POST,
+                question=question,
+            )
+            v_idx += 1
+        q_idx += 1
+
+    return redirect('dashboard')

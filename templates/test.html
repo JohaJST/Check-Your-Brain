@@ -5,149 +5,190 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ APP_NAME }} // {{ test.name }}</title>
     <link rel="stylesheet" href="{% static 'style.css' %}">
-    <!-- FontAweome CDN Link for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+    <style>
+        a { text-decoration: none; }
+
+        /* ── Already-taken card ─────────────────────────────── */
+        .taken-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #f4f6f9;
+        }
+        .taken-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,.10);
+            padding: 48px 40px 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .taken-card .icon-circle {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            background: #e8f5e9;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px; color: #43a047;
+        }
+        .taken-card h2 { margin: 0 0 8px; font-size: 22px; color: #1a1a2e; }
+        .taken-card p  { color: #666; font-size: 14px; margin: 0 0 28px; line-height: 1.6; }
+        .btn-primary-full {
+            display: block; width: 100%;
+            padding: 14px;
+            background: #3b2fd8;
+            color: #fff;
+            border: none; border-radius: 10px;
+            font-size: 16px; font-weight: 600;
+            cursor: pointer; text-align: center;
+            margin-bottom: 12px;
+        }
+        .btn-primary-full:hover { background: #2f25b0; color: #fff; }
+        .btn-ghost {
+            display: block; width: 100%;
+            padding: 12px;
+            background: transparent;
+            color: #888; border: none;
+            font-size: 14px; cursor: pointer;
+        }
+        .btn-ghost:hover { color: #333; }
+
+        /* ── Wait screen ────────────────────────────────────── */
+        .wait-text {
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh;
+        }
+        .wait-text h1 { color: #555; font-size: 24px; }
+    </style>
 </head>
 <body>
-    <style>
-        a{
-        text-decoration: None;
-        }
-    </style>
-    {% if test.is_start %}
-    <!-- start Quiz button -->
-        <div class="start_btn"><button>Начать Тест</button></div>
-    
-        <!-- Info Box -->
-        <div class="info_box">
-            <div class="info-title"><span>Правила теста</span></div>
-            <div class="info-list">
-                <div class="info">1. После того как вы выберете ответ, его нельзя будет отменить.</div>
-                <div class="info">2. После оканчение теста нвжмите на кнопку выйти</div>
-                <div class="info">3. Вы получите баллы за правильные ответы</div>
-                <div class="info">4. Сколько баллов вы набрали можно будет посмотреть когда вы закончите тест</div>
 
-            </div>
-            <div class="buttons">
-                <button class="quit"><a href="{% url 'home' %}">Выйти</a></button>
-                <button class="restart">Далее</button>
-            </div>
+{% if existing %}
+    <!--{# ════════════════════════════════════════════════════════
+       SCREEN: Test already taken — show summary card
+       ════════════════════════════════════════════════════════ #}-->
+    <div class="taken-wrapper">
+        <div class="taken-card">
+            <div class="icon-circle"><i class="fas fa-trophy"></i></div>
+            <h2>Тест уже пройден</h2>
+            <p>
+                Результат: <strong>{{ existing.result }} / {{ existing.totalQuestions }}</strong><br>
+                Процент: <strong>{{ existing.foyiz }}%</strong><br>
+                Дата: <strong>{{ existing.created|date:"d.m.Y" }}</strong><br>
+            </p>
+            <a href="{% url 'test_result' test_id=test.id %}" class="btn-primary-full">
+                Посмотреть результаты
+            </a>
+            <a href="{% url 'home' %}" class="btn-ghost">На главную</a>
         </div>
-    
-        <!-- Quiz Box -->
-        <div class="quiz_box">
-            <header>
-                <div class="title">{{ APP_NAME }}</div>
-            </header>
-            <section>
-                <div class="que_text">
-                    <!-- Here I've inserted question from JavaScript -->
-                </div>
-                <div class="option_list">
-                    <!-- Here I've inserted options from JavaScript -->
-                    {% for v in variant %}{% if v.question_id == question.first.id %}
+    </div>
+
+{% elif not test.is_start %}
+    <!--{# ════════════════════════════════════════════════════════
+       SCREEN: Test not started yet
+       ════════════════════════════════════════════════════════ #}-->
+    <div class="wait-text"><h1>Ждём начала теста…</h1></div>
+
+{% else %}
+    <!--{# ════════════════════════════════════════════════════════
+       SCREEN: Active test — quiz UI
+       ════════════════════════════════════════════════════════ #}-->
+
+    <div class="start_btn"><button>Начать Тест</button></div>
+
+    <div class="info_box">
+        <div class="info-title"><span>Правила теста</span></div>
+        <div class="info-list">
+            <div class="info">1. После того как вы выберете ответ, его нельзя будет отменить.</div>
+            <div class="info">2. После окончания теста нажмите на кнопку «Выйти».</div>
+            <div class="info">3. Вы получите баллы за правильные ответы.</div>
+            <div class="info">4. Количество набранных баллов отображается после завершения теста.</div>
+        </div>
+        <div class="buttons">
+            <button class="quit"><a href="{% url 'home' %}">Выйти</a></button>
+            <button class="restart">Далее</button>
+        </div>
+    </div>
+
+    <div class="quiz_box">
+        <header>
+            <div class="title">{{ APP_NAME }}</div>
+        </header>
+        <section>
+            <div class="que_text"></div>
+            <div class="option_list">
+                {% for v in variant %}
+                    {% if v.question_id == question.first.id %}
                         <div class="option"><span>1</span></div>
-                    {% endif %} {% endfor %}
-                </div>
-            </section>
-    
-            <!-- footer of Quiz Box -->
-            <footer>
-                <div class="total_que">
-                    <!-- Here I've inserted Question Count Number from JavaScript -->
-                </div>
-                <button class="next_btn">Cледуюший вопрос</button>
-            </footer>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+        <footer>
+            <div class="total_que"></div>
+            <button class="next_btn">Следующий вопрос</button>
+        </footer>
+    </div>
+
+    <div class="result_box">
+        <div class="icon"><i class="fas fa-crown"></i></div>
+        <div class="complete_text">Тест закончен</div>
+        <div class="score_text"></div>
+        <div class="buttons">
+            <form method="post" id="results-id">
+                {% csrf_token %}
+                <div class="result_for_backend"></div>
+                <button type="submit" class="quit">Выйти</button>
+            </form>
         </div>
-    
-        <!-- Result Box -->
-        <div class="result_box">
-            <div class="icon">
-                <i class="fas fa-crown"></i>
-            </div>
-            <div class="complete_text">Тест закончен</div>
-            <div class="score_text">
-                <!-- Here I've inserted Score Result from JavaScript -->
-            </div>
-            <div class="buttons">
-                <form method="post" id="results-id">
-                    {% csrf_token %}
-        {#            <button class="restart">Replay Quiz</button>#}
-                        <div class="result_for_backend"></div>
-                    <button type="submit" class="quit">Выйти</button>
-                </form>
-            </div>
-        </div>
-    {% else %}
-        <div class="wait-text"><h1>Ждём начала теста...</h1></div>
-    {% endif %}
-    <!-- Inside this JavaScript file I've coded all Quiz Codes -->
-    <script src="{% static 'script.js' %}"></script>
-    <script>
-        function showQuetions(index){
-    const que_text = document.querySelector(".que_text");
+    </div>
 
-    {#//creating a new span and div tag for question and option and passing the value using array index#}
-    {#let que_tag = '<span>'+ questions[index].numb + ". " + questions[index].question +'</span>';#}
-    let que_tag = '<span>' + questions[index].question +'</span>';
-    {#let option_tag = {% for q in question %}{% for v in variant %}{% if v.question_id == q.id %}#}
-    {#    '<div class="option"><span>'+ questions[index].options[{{ forloop.counter0 }}] +'</span></div>'{% endif %}{% endfor %}{% endfor %};#}
-    que_text.innerHTML = que_tag; //adding new span tag inside que_tag
-    {#option_list.innerHTML = option_tag; //adding new div tag inside option_tag#}
-
-    const option = option_list.querySelectorAll(".option");
-    {#option.innerHTML = "Test"#}
-    var myClasses = document.getElementsByClassName("option");
-
-    for (var i = 0; i < myClasses.length; i++) {
-      myClasses[i].innerHTML = questions[index].options[i];
-      }
-    // set onclick attribute to all available options
-    for(i=0; i < option.length; i++){
-        option[i].setAttribute("onclick", "optionSelected(this)");
-    }
-    const allOptions = option_list.children.length; //getting all option items
-
-    for(i=0; i < allOptions; i++){
-        option_list.children[i].classList.remove("disabled"); //once user select an option then disabled all options
-    }
-}
-    </script>
-    <script> 
-    let questions = [
+    {# ── Data injection (JSON, not executed as JS) ─────────────────────── #}
+    <script id="questions-data" type="application/json">
+    [
         {% for q in question %}
-            {
-            numb: {{ q.id }},
-            question: "{{ q.text }}",
-            {% for a in variant %}
-                {% if a.question_id == q.id and a.is_answer %}
-                    answer: "{{ a.text }}",
-                {% endif %}
-            {% endfor %}
-            options: [
+        {
+            "id":      {{ q.id }},
+            "question": "{{ q.text|escapejs }}",
+            "answer":  "{% for a in variant %}{% if a.question_id == q.id and a.is_answer %}{{ a.text|escapejs }}{% endif %}{% endfor %}",
+            "options": [
                 {% for v in variant %}
                     {% if v.question_id == q.id %}
-                        "{{ v.text }}",
+                    {"id": {{ v.id }}, "text": "{{ v.text|escapejs }}"}{% if not forloop.last %},{% endif %}
                     {% endif %}
                 {% endfor %}
             ]
-          },
+        }{% if not forloop.last %},{% endif %}
         {% endfor %}
-  // you can uncomment the below codes and make duplicate as more as you want to add question
-  // but remember you need to give the numb value serialize like 1,2,3,5,6,7,8,9.....
-
-  //   {
-  //   numb: 6,
-  //   question: "Your Question is Here",
-  //   answer: "Correct answer of the question is here",
-  //   options: [
-  //     "Option 1",
-  //     "option 2",
-  //     "option 3",
-  //     "option 4"
-  //   ]
-  // },
-];
+    ]
     </script>
+
+    <script src="{% static 'script.js' %}"></script>
+    <script>
+        // Parse questions from the JSON data block (safe — never executed as code)
+        const questions = JSON.parse(
+            document.getElementById("questions-data").textContent
+        );
+
+        function showQuetions(index) {
+            const que_text   = document.querySelector(".que_text");
+            const option_list = document.querySelector(".option_list");
+
+            que_text.innerHTML = "<span>" + questions[index].question + "</span>";
+
+            const opts = questions[index].options;
+            let optHtml = "";
+            opts.forEach(function(opt) {
+                optHtml += '<div class="option" onclick="optionSelected(this)">'
+                         + opt.text + "</div>";
+            });
+            option_list.innerHTML = optHtml;
+        }
+    </script>
+{% endif %}
+
 </body>
 </html>

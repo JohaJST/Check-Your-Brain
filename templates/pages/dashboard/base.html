@@ -1,320 +1,259 @@
 <!DOCTYPE html>
-{% load static %}
-<!--
-This is a starter template page. Use this page to start your new project from
-scratch. This page gets rid of all links and provides the needed markup only.
--->
-<html lang="en">
+<html lang="ru" class="h-full">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Панель{% endblock %} — {{ APP_NAME }}</title>
 
-  <title>{{ APP_NAME }}</title>
-  <!-- Ionicons -->
-  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-  <!-- DataTables -->
-  <link rel="stylesheet" href="{% static 'plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
-  <link rel="stylesheet" href="{% static 'plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
-  <!-- Theme style -->
-  <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
-  <!-- Google Font: Source Sans Pro -->
-  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-    {% block header %}{% endblock %}
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50:  '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                            950: '#1e1b4b',
+                        },
+                        slate: {
+                            750: '#2a3441',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6.5.1 -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer">
+
+    <style>
+        /* Custom thin scrollbar */
+        ::-webkit-scrollbar            { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track      { background: transparent; }
+        ::-webkit-scrollbar-thumb      { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover{ background: #475569; }
+        *                              { scrollbar-width: thin; scrollbar-color: #334155 transparent; }
+        /* Sidebar slide transition */
+        #sidebar { transition: transform .28s cubic-bezier(.4,0,.2,1); }
+    </style>
+
+    {% block head %}{% endblock %}
 </head>
-<body class="hold-transition sidebar-mini">
-<!-- Site wrapper -->
-<div class="wrapper">
+<body class="bg-slate-950 text-white font-sans antialiased overflow-hidden h-full">
 
-  <!-- Navbar -->
-  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-    <!-- Left navbar links -->
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-      </li>
-      <li class="nav-item d-none d-sm-inline-block">
-        <a href="{% url 'dashboard' %}" class="nav-link">Home</a>
-      </li>
-      <li class="nav-item d-none d-sm-inline-block">
-        <a href="#" class="nav-link">Contact</a>
-      </li>
-    </ul>
+    <!-- Mobile overlay -->
+    <div id="sidebar-overlay"
+         onclick="toggleSidebar()"
+         class="fixed inset-0 bg-black/60 backdrop-blur-sm z-20 hidden lg:hidden"></div>
 
-    <!-- SEARCH FORM -->
-<!--    <form class="form-inline ml-3">-->
-<!--      <div class="input-group input-group-sm">-->
-<!--        <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">-->
-<!--        <div class="input-group-append">-->
-<!--          <button class="btn btn-navbar" type="submit">-->
-<!--            <i class="fas fa-search"></i>-->
-<!--          </button>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </form>-->
+    <div class="flex h-screen">
 
-    <!-- Right navbar links -->
-<!--    <ul class="navbar-nav ml-auto">-->
-<!--      &lt;!&ndash; Messages Dropdown Menu &ndash;&gt;-->
-<!--      <li class="nav-item dropdown">-->
-<!--        <a class="nav-link" data-toggle="dropdown" href="#">-->
-<!--          <i class="far fa-comments"></i>-->
-<!--          <span class="badge badge-danger navbar-badge">3</span>-->
-<!--        </a>-->
-<!--        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">-->
-<!--          <a href="#" class="dropdown-item">-->
-<!--            &lt;!&ndash; Message Start &ndash;&gt;-->
-<!--            <div class="media">-->
-<!--              <img src="../../dist/img/user1-128x128.jpg" alt="User Avatar" class="img-size-50 mr-3 img-circle">-->
-<!--              <div class="media-body">-->
-<!--                <h3 class="dropdown-item-title">-->
-<!--                  Brad Diesel-->
-<!--                  <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>-->
-<!--                </h3>-->
-<!--                <p class="text-sm">Call me whenever you can...</p>-->
-<!--                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--            &lt;!&ndash; Message End &ndash;&gt;-->
-<!--          </a>-->
-<!--          <div class="dropdown-divider"></div>-->
-<!--          <a href="#" class="dropdown-item">-->
-<!--            &lt;!&ndash; Message Start &ndash;&gt;-->
-<!--            <div class="media">-->
-<!--              <img src="../../dist/img/user8-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3">-->
-<!--              <div class="media-body">-->
-<!--                <h3 class="dropdown-item-title">-->
-<!--                  John Pierce-->
-<!--                  <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>-->
-<!--                </h3>-->
-<!--                <p class="text-sm">I got your message bro</p>-->
-<!--                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--            &lt;!&ndash; Message End &ndash;&gt;-->
-<!--          </a>-->
-<!--          <div class="dropdown-divider"></div>-->
-<!--          <a href="#" class="dropdown-item">-->
-<!--            &lt;!&ndash; Message Start &ndash;&gt;-->
-<!--            <div class="media">-->
-<!--              <img src="../../dist/img/user3-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3">-->
-<!--              <div class="media-body">-->
-<!--                <h3 class="dropdown-item-title">-->
-<!--                  Nora Silvester-->
-<!--                  <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>-->
-<!--                </h3>-->
-<!--                <p class="text-sm">The subject goes here</p>-->
-<!--                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--            &lt;!&ndash; Message End &ndash;&gt;-->
-<!--          </a>-->
-<!--          <div class="dropdown-divider"></div>-->
-<!--          <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>-->
-<!--        </div>-->
-<!--      </li>-->
-<!--      &lt;!&ndash; Notifications Dropdown Menu &ndash;&gt;-->
-<!--      <li class="nav-item dropdown">-->
-<!--        <a class="nav-link" data-toggle="dropdown" href="#">-->
-<!--          <i class="far fa-bell"></i>-->
-<!--          <span class="badge badge-warning navbar-badge">15</span>-->
-<!--        </a>-->
-<!--        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">-->
-<!--          <span class="dropdown-item dropdown-header">15 Notifications</span>-->
-<!--          <div class="dropdown-divider"></div>-->
-<!--          <a href="#" class="dropdown-item">-->
-<!--            <i class="fas fa-envelope mr-2"></i> 4 new messages-->
-<!--            <span class="float-right text-muted text-sm">3 mins</span>-->
-<!--          </a>-->
-<!--          <div class="dropdown-divider"></div>-->
-<!--          <a href="#" class="dropdown-item">-->
-<!--            <i class="fas fa-users mr-2"></i> 8 friend requests-->
-<!--            <span class="float-right text-muted text-sm">12 hours</span>-->
-<!--          </a>-->
-<!--          <div class="dropdown-divider"></div>-->
-<!--          <a href="#" class="dropdown-item">-->
-<!--            <i class="fas fa-file mr-2"></i> 3 new reports-->
-<!--            <span class="float-right text-muted text-sm">2 days</span>-->
-<!--          </a>-->
-<!--          <div class="dropdown-divider"></div>-->
-<!--          <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>-->
-<!--        </div>-->
-<!--      </li>-->
-<!--      <li class="nav-item">-->
-<!--        <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">-->
-<!--          <i class="fas fa-th-large"></i>-->
-<!--        </a>-->
-<!--      </li>-->
-<!--    </ul>-->
-  </nav>
-  <!-- /.navbar -->
+        <!-- ─── Sidebar ──────────────────────────────────────────── -->
+        <aside id="sidebar"
+               class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 border-r border-slate-800
+                      flex flex-col -translate-x-full lg:translate-x-0">
 
-  <!-- Main Sidebar Container -->
-  <aside class="main-sidebar sidebar-dark-primary elevation-4">
-    <!-- Brand Logo -->
-    <a href="{% url 'dashboard' %}" class="brand-link">
-      <img src="{% static 'dist/img/AdminLTELogo.png' %}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
-           style="opacity: .8">
-      <span class="brand-text font-weight-light">{{APP_NAME}}</span>
-    </a>
+            <!-- Brand -->
+            <div class="h-16 flex items-center gap-3 px-5 border-b border-slate-800 shrink-0">
+                <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-brain text-white text-sm"></i>
+                </div>
+                <span class="font-bold text-white text-base tracking-tight truncate">{{ APP_NAME }}</span>
+            </div>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <!-- Sidebar user panel (optional) -->
-      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-        <div class="image">
-          <img src="{% static 'dist/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User Image">
+            <!-- Navigation -->
+            <nav class="flex-1 overflow-y-auto py-3 px-3 space-y-0.5">
+
+                <!-- Overview -->
+                <a href="{% url 'dashboard' %}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+                          text-slate-300 hover:text-white hover:bg-slate-800 transition-all group">
+                    <i class="fa-solid fa-chart-pie w-4 text-center text-slate-400
+                               group-hover:text-indigo-400 transition-colors shrink-0"></i>
+                    <span>Обзор</span>
+                </a>
+
+                <div class="my-2 border-t border-slate-800/80"></div>
+                <p class="px-3 pt-1 pb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">
+                    Данные
+                </p>
+
+                <a href="{% url 'dlist' tip='user' %}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+                          text-slate-300 hover:text-white hover:bg-slate-800 transition-all group">
+                    <i class="fa-solid fa-users w-4 text-center text-slate-400
+                               group-hover:text-indigo-400 transition-colors shrink-0"></i>
+                    <span>Пользователи</span>
+                </a>
+
+                <a href="{% url 'dlist' tip='quiz' %}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+                          text-slate-300 hover:text-white hover:bg-slate-800 transition-all group">
+                    <i class="fa-solid fa-clipboard-list w-4 text-center text-slate-400
+                               group-hover:text-indigo-400 transition-colors shrink-0"></i>
+                    <span>Тесты</span>
+                </a>
+
+                <a href="{% url 'dlist' tip='result' %}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+                          text-slate-300 hover:text-white hover:bg-slate-800 transition-all group">
+                    <i class="fa-solid fa-chart-bar w-4 text-center text-slate-400
+                               group-hover:text-indigo-400 transition-colors shrink-0"></i>
+                    <span>Результаты</span>
+                </a>
+
+                <a href="{% url 'dlist' tip='classroom' %}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+                          text-slate-300 hover:text-white hover:bg-slate-800 transition-all group">
+                    <i class="fa-solid fa-school w-4 text-center text-slate-400
+                               group-hover:text-indigo-400 transition-colors shrink-0"></i>
+                    <span>Классы</span>
+                </a>
+
+                <a href="{% url 'dlist' tip='subject' %}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+                          text-slate-300 hover:text-white hover:bg-slate-800 transition-all group">
+                    <i class="fa-solid fa-book w-4 text-center text-slate-400
+                               group-hover:text-indigo-400 transition-colors shrink-0"></i>
+                    <span>Предметы</span>
+                </a>
+
+                <div class="my-2 border-t border-slate-800/80"></div>
+                <p class="px-3 pt-1 pb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">
+                    Создать
+                </p>
+
+                <a href="{% url 'action_no_pk' status='create' path='test' %}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+                          text-indigo-300 hover:text-indigo-200 hover:bg-indigo-600/20 transition-all group">
+                    <i class="fa-solid fa-plus w-4 text-center text-indigo-400
+                               group-hover:text-indigo-300 transition-colors shrink-0"></i>
+                    <span>Создать тест</span>
+                </a>
+
+                <a href="{% url 'userform' %}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+                          text-indigo-300 hover:text-indigo-200 hover:bg-indigo-600/20 transition-all group">
+                    <i class="fa-solid fa-user-plus w-4 text-center text-indigo-400
+                               group-hover:text-indigo-300 transition-colors shrink-0"></i>
+                    <span>Добавить ученика</span>
+                </a>
+
+                <a href="{% url 'action_no_pk' status='create' path='classroom' %}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+                          text-slate-300 hover:text-white hover:bg-slate-800 transition-all group">
+                    <i class="fa-solid fa-plus w-4 text-center text-slate-400
+                               group-hover:text-indigo-400 transition-colors shrink-0"></i>
+                    <span>Добавить класс</span>
+                </a>
+
+                <a href="{% url 'action_no_pk' status='create' path='subject' %}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+                          text-slate-300 hover:text-white hover:bg-slate-800 transition-all group">
+                    <i class="fa-solid fa-plus w-4 text-center text-slate-400
+                               group-hover:text-indigo-400 transition-colors shrink-0"></i>
+                    <span>Добавить предмет</span>
+                </a>
+
+            </nav>
+
+            <!-- Bottom: user info + logout -->
+            <div class="p-3 border-t border-slate-800 shrink-0">
+                <div class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-800 transition-all">
+                    <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center shrink-0">
+                        <span class="text-xs font-bold text-white">{{ request.user.name|first|upper }}</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-white truncate">{{ request.user.name }}</p>
+                        <p class="text-xs text-slate-500 truncate">{{ request.user.username }}</p>
+                    </div>
+                    <a href="{% url 'logout' %}"
+                       title="Выйти"
+                       class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400
+                              hover:bg-rose-500/10 transition-all">
+                        <i class="fa-solid fa-right-from-bracket text-sm"></i>
+                    </a>
+                </div>
+            </div>
+        </aside>
+        <!-- ─── End Sidebar ──────────────────────────────────────── -->
+
+        <!-- ─── Main Column ──────────────────────────────────────── -->
+        <div class="flex flex-col flex-1 min-w-0 lg:pl-64">
+
+            <!-- Top header -->
+            <header class="h-16 bg-slate-900/80 backdrop-blur-md border-b border-slate-800
+                           flex items-center px-4 lg:px-6 gap-3 shrink-0 sticky top-0 z-10">
+
+                <!-- Hamburger (mobile only) -->
+                <button onclick="toggleSidebar()"
+                        class="lg:hidden p-2 rounded-xl text-slate-400 hover:text-white
+                               hover:bg-slate-800 transition-all">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+
+                <!-- Page title (from child block) -->
+                <div class="flex-1 min-w-0">
+                    <span class="text-sm font-semibold text-slate-200 truncate">
+                        {% block page_title %}Панель управления{% endblock %}
+                    </span>
+                </div>
+
+                <!-- User avatar -->
+                <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center shrink-0">
+                    <span class="text-xs font-bold text-white">{{ request.user.name|first|upper }}</span>
+                </div>
+            </header>
+
+            <!-- Page content -->
+            <main class="flex-1 overflow-y-auto p-4 lg:p-8">
+                {% block content %}{% endblock %}
+            </main>
+
         </div>
-        <div class="info">
-          <a href="#" class="d-block">{{ request.user.name }}</a>
-        </div>
-      </div>
+        <!-- ─── End Main Column ─────────────────────────────────── -->
 
-      <!-- Sidebar Menu -->
-      <nav class="mt-2">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-          <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
-          <li class="nav-item has-treeview menu-open">
-            <a href="#" class="nav-link active">
-              <i class="nav-icon fas fa-tachometer-alt"></i>
-              <p>
-                Admin Panel
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="{% url 'dlist' tip='user' %}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>User</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{% url 'dlist' tip='result' %}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Result</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{% url 'dlist' tip='classroom' %}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Class Room</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{% url 'dlist' tip='subject' %}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Subject</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{% url 'dlist' tip='quiz' %}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Quiz</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{% url 'dlist' tip='variant' %}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Variant</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{% url 'dlist' tip='question' %}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Question</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{% url "action_no_pk" status="create" path="test" %}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Create Test</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{% url "action_no_pk" status="create" path="classroom" %}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Add Classroom</p>
-                </a>
-              </li>
-            <li class="nav-item">
-                <a href="{% url "action_no_pk" status="create" path="subject" %}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Add Subject</p>
-                </a>
-              </li>
-                <li class="nav-item">
-                <a href="{% url 'userform' %}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Add User</p>
-                </a>
-              </li>
-                <li class="nav-item">
-                <a href="{% url "logout" %}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Logout</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </nav>
-      <!-- /.sidebar-menu -->
     </div>
-    <!-- /.sidebar -->
-  </aside>
 
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            const isOpen  = !sidebar.classList.contains('-translate-x-full');
+            if (isOpen) {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            } else {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+    </script>
 
-    <!-- Main content -->
-    <section class="content">
-        {% block content %} {% endblock %}
-    </section>
-    <!-- /.content -->
-  </div>
-  <!-- /.content-wrapper -->
-
-  <!-- Control Sidebar -->
-  <aside class="control-sidebar control-sidebar-dark">
-    <!-- Control sidebar content goes here -->
-  </aside>
-  <!-- /.control-sidebar -->
-</div>
-<!-- ./wrapper -->
-
-<!-- jQuery -->
-<script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
-<!-- Bootstrap 4 -->
-<script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-<!-- AdminLTE App -->
-<script src="{% static 'dist/js/adminlte.min.js' %}"></script>
-<!-- AdminLTE for demo purposes -->
-<script src="{% static 'dist/js/demo.js' %}"></script>
-<!-- DataTables -->
-<script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
-<script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
-<script src="{% static 'plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
-<script>
-  $(function () {
-    $("#example1").DataTable({
-      "responsive": true,
-      "autoWidth": false,
-    });
-    $('#example2').DataTable({
-      "paging": true,
-      "lengthChange": false,
-      "searching": false,
-      "ordering": true,
-      "info": true,
-      "autoWidth": false,
-      "responsive": true,
-    });
-  });
-</script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

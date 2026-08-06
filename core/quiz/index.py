@@ -1,58 +1,75 @@
-from contextlib import closing
-
 from django.contrib.auth.decorators import login_required
-from django.db import connection
-from django.shortcuts import render, redirect
-from methodism import dictfetchone, dictfetchall
+from django.db.models import Avg, Count
+from django.shortcuts import redirect, render
 
-from core.models import Subject, Result, Test
+from core.models import Result, Test
 
 
 @login_required(login_url="login")
 def index(request, pk=None):
-    sql = f"""
-    SELECT s.id, s.name
-    FROM core_classroomssubjects cs
-    INNER JOIN core_subject s ON cs.subject_id = s.id
-    WHERE cs.classroom_id = {request.user.classroom_id}
-    group by s.id 
     """
-    with closing(connection.cursor()) as cursor:
-        cursor.execute(sql)
-        subjects = dictfetchall(cursor)
-    # print(subjects)
-    # subjects = Subject.objects.all()
-    # print("1")
-    if pk:
-        sql = f"""select ct.id, ct.name, ct.desc, ct.created from core_testclassroom tc
-                inner join main.core_test ct on tc.test_id = ct.id
-            inner join main.core_classroomssubjects cc on cc.classroom_id = tc.classroom_id and cc.subject_id = ct.subject_id
-            where tc.classroom_id = {request.user.classroom_id} and cc.subject_id = {pk} and cc.classroom_id = {request.user.classroom_id}
-"""
-        with closing(connection.cursor()) as cursor:
-            cursor.execute(sql)
-            tests = dictfetchall(cursor)
-        # tests = Test.objects.filter(subject_id=pk)
-        # print(tests)
-        # print("11")
-        return render(request, 'index.html', {'tests': tests})
-    # print("2")
-    # print(subjects)
-    return render(request, 'index.html', {'subjects': subjects,  "is_subject": True})
+    Единый список всех тестов, доступных классу текущего пользователя.
+
+    Параметр `pk` (subject id) сохранён для совместимости с URL /subject/<pk>/,
+    но в данной версии он не используется — все активные тесты отображаются
+    на одной странице.
+    """
+    if request.user.birthday is None or request.user.phone is None:
+        return redirect("required")
+
+    # Один запрос: тесты для класса + subject через JOIN (select_related).
+    # .distinct() необходим, т.к. через test_classrooms возможны дубли.
+    tests = (
+        Test.objects
+        .filter(
+            test_classrooms__classroom=request.user.classroom,
+            is_start=True,
+        )
+        .select_related('subject')
+        .annotate(question_count=Count('variantas__questions', distinct=True))
+        .distinct()
+        .order_by('-created')
+    )
+
+    completed_test_ids = set(
+        Result.objects
+        .filter(user=request.user)
+        .values_list('test_id', flat=True)
+    )
+
+    return render(request, 'index.html', {'tests': tests, 'completed_test_ids': completed_test_ids})
 
 
 @login_required(login_url="login")
 def user_profile(request):
-    current_user = request.user
-    results = Result.objects.all()
-    results_list = []
-    average = 0
-    tmp = 0
-    for result in results:
-        if result.user == current_user:
-            results_list.append(result)
-            average += result.result
-            tmp += 1
+    """Профиль пользователя с историей результатов и средним баллом."""
+    # Фильтруем на уровне БД вместо перебора всех записей в Python.
+    results = (
+        Result.objects
+        .filter(user=request.user)
+        .select_related('test')
+        .order_by('-created')
+    )
+    # Avg корректно игнорирует NULL-значения.
+    average = results.aggregate(avg=Avg('result'))['avg']
 
-    ctx = {"user": current_user, "results": results, "average": average/tmp}
+    ctx = {
+        "user": request.user,
+        "results": results,
+        "average": round(average, 1) if average is not None else None,
+    }
     return render(request, "profile.html", ctx)
+
+
+def required(request):
+    """Требование заполнить дату рождения и телефон при первом входе."""
+    if request.method == "POST":
+        try:
+            u = request.user
+            u.birthday = request.POST['birthday']
+            u.phone = request.POST['phone']
+            u.save()
+            return redirect("home")
+        except Exception:
+            return render(request, 'pages/reqPB.html', {'error': 'Проверьте данные пожалуйста'})
+    return render(request, 'pages/reqPB.html')

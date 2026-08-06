@@ -1,3 +1,11 @@
-from .auth import User
-from .classrooms import ClassRooms, Subject, ClassRoomsSubjects
-from .test import Test, Question, Variant, Result, TestClassRoom
+from .auth import Otp, Role, TG_User, User
+from .classrooms import ClassRooms, ClassRoomsSubjects, Subject
+from .test import (
+    OldResult,
+    Question,
+    Result,
+    Test,
+    TestClassRoom,
+    TestVarianta,
+    Variant,
+)

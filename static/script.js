@@ -147,8 +147,20 @@ function showResult(){
     // form.submit();
      // if user scored more than 3
         //creating a new span tag and passing the user score number and total question number
-    let scoreTag = '<span>Вы набрали <p>'+ userScore +'</p> из <p>'+ questions.length +'</p></span>';
-    scoreText.innerHTML = scoreTag;  //adding new span tag inside score_Text
+    let foyiz = userScore * 100 / questions.length
+    console.log(foyiz);
+    if (foyiz > 80) {
+        let scoreTag = '<center><h3>Здорово</h3><span>Вы набрали <p>'+ userScore +'</p> из <p>'+ questions.length +'</p></span></center>';
+            scoreText.innerHTML = scoreTag;  //adding new span tag inside score_Text
+    }
+    else if (80 > foyiz && foyiz >= 50) {
+        let scoreTag = '<center><h3>Нормально</h3><span>Вы набрали <p>'+ userScore +'</p> из <p>'+ questions.length +'</p></span></center>';
+            scoreText.innerHTML = scoreTag;  //adding new span tag inside score_Text
+    }
+    else{
+        let scoreTag = '<center><h3>Нужно по тренироваться</h3><span>Вы набрали <p>'+ userScore +'</p> из <p>'+ questions.length +'</p></span></center>';
+        scoreText.innerHTML = scoreTag;  //adding new span tag inside score_Text
+    }
 }
 
 function queCounter(index){

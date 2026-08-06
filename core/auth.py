@@ -8,20 +8,27 @@ from core.models import User, ClassRooms
 def sign_in(requests):
     if not requests.user.is_anonymous:
         return redirect("home")
-
+    ctx = {
+        "u": User.objects.all(),
+        "c": ClassRooms.objects.all()
+    }
     if requests.POST:
         data = requests.POST
-        user = User.objects.filter(username=data['username']).first()
-
+        user = User.objects.filter(id=int(data["user"])).first()
         if not user:
-            return render(requests, 'pages/auth/login.html', {"error": "Username xato"})
+            ctx["error"] = "Абитуриент(ка) не найден(а)"
+            return render(requests, 'pages/auth/login.html', ctx)
 
         if not user.is_active:
-            return render(requests, 'pages/auth/login.html', {"error": "Profil active emas "})
+
+            ctx["error"] = "Профиль не активен"
+            return render(requests, 'pages/auth/login.html', ctx)
         login(requests, user)
+        if user.is_admin:
+            return redirect("lock")
         return redirect('home')
 
-    return render(requests, 'pages/auth/login.html')
+    return render(requests, 'pages/auth/login.html', ctx)
 
 
 def regis(request):
@@ -135,5 +142,7 @@ def regis(request):
 
 @login_required(login_url='login')
 def sign_out(request):
+    request.user.in_dashboard = False
+    request.user.save()
     logout(request)
     return redirect("login")
